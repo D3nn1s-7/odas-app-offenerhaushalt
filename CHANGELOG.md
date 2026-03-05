@@ -2,7 +2,7 @@
 
 ## ToDo
 
-- Config über Nginx laden
+- Frictionless Schema hinzufügen
 
 ## 21.02.2025
 
