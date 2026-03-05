@@ -1,0 +1,22 @@
+{
+  "apiVersion": "1",
+  "titel": "Offener Haushalt",
+  "seitentitel": "Offener Haushalt",
+  "icon": "{{{odp.logo}}}",
+  "brandingCSS": "",
+  "brandingCSSFile": "",
+  "beschreibung": [
+    "Diese App visualisiert den kommunalen Haushalt interaktiv. ",
+    "Einnahmen und Ausgaben werden nach Produktbereichen und Produktgruppen dargestellt. ",
+    "## Datenquelle",
+    "Die Daten stammen aus dem Open Data Portal der Kommune."
+  ],
+  "kontakt": ["Bei Fragen wenden Sie sich bitte an die zuständige Stelle."],
+  "impressum": ["Angaben gemäß § 5 TMG"],
+  "datenschutz": "Informationen zum Datenschutz finden Sie auf der Website der Kommune.",
+  "urlODP": "",
+  "urlDaten": "",
+  "fusszeile": ["(C) Copyright 2026 | ", "App-Entwickler: Ondics GmbH"],
+  "apiurl": "",
+  "sprache": "de"
+}

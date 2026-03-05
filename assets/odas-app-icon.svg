@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8ec5fc"/>
+      <stop offset="100%" style="stop-color:#6b76d4"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="rgba(0,0,0,0.25)"/>
+    </filter>
+    <linearGradient id="stationGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4ade80"/>
+      <stop offset="100%" style="stop-color:#16a34a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Hintergrund: abgerundetes Quadrat mit Gradient (gleich wie Baumkataster) -->
+  <rect width="512" height="512" rx="110" ry="110" fill="url(#bgGrad)"/>
+
+  <!-- Ladesäule: Gehäuse -->
+  <rect x="178" y="130" width="156" height="230" rx="22" ry="22"
+        fill="url(#stationGrad)" filter="url(#shadow)"/>
+
+  <!-- Tiefe / Seite der Säule -->
+  <rect x="300" y="130" width="34" height="230" rx="22" ry="22"
+        fill="#15803d" opacity="0.3"/>
+
+  <!-- Display-Fläche -->
+  <rect x="200" y="155" width="112" height="72" rx="10" ry="10"
+        fill="#bbf7d0" opacity="0.85"/>
+
+  <!-- Blitz-Symbol im Display -->
+  <polygon points="268,168 248,195 262,195 244,222 272,192 256,192 272,168"
+           fill="#15803d"/>
+
+  <!-- Kabel-Anschluss -->
+  <rect x="193" y="248" width="126" height="54" rx="8" ry="8"
+        fill="#166534" opacity="0.7"/>
+
+  <!-- Kabel links -->
+  <path d="M 220 302 Q 160 340 148 390" stroke="#1e3a5f" stroke-width="10"
+        fill="none" stroke-linecap="round"/>
+  <rect x="130" y="388" width="36" height="24" rx="6" ry="6" fill="#1e3a5f"/>
+  <rect x="138" y="380" width="8" height="12" rx="3" ry="3" fill="#374151"/>
+  <rect x="150" y="380" width="8" height="12" rx="3" ry="3" fill="#374151"/>
+
+  <!-- Kabel rechts -->
+  <path d="M 292 302 Q 352 340 364 390" stroke="#1e3a5f" stroke-width="10"
+        fill="none" stroke-linecap="round"/>
+  <rect x="346" y="388" width="36" height="24" rx="6" ry="6" fill="#1e3a5f"/>
+  <rect x="354" y="380" width="8" height="12" rx="3" ry="3" fill="#374151"/>
+  <rect x="366" y="380" width="8" height="12" rx="3" ry="3" fill="#374151"/>
+
+  <!-- Bodenplatte -->
+  <rect x="160" y="355" width="192" height="18" rx="9" ry="9"
+        fill="#15803d" opacity="0.5"/>
+
+  <!-- Glanzpunkt -->
+  <ellipse cx="210" cy="155" rx="28" ry="18" fill="white" opacity="0.18"/>
+</svg>
