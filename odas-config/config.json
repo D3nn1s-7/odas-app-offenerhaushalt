@@ -17,6 +17,6 @@
   "urlODP": "",
   "urlDaten": "",
   "fusszeile": ["(C) Copyright 2026 | ", "App-Entwickler: Ondics GmbH"],
-  "apiurl": "",
+  "apiurl": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
   "sprache": "de"
 }

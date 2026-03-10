@@ -170,7 +170,7 @@
         "typ": "url",
         "laenge": 255
       },
-      "default": "",
+      "default": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
       "beispiel": "",
       "erforderlich": "ja"
     },

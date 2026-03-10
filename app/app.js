@@ -26,28 +26,80 @@
  */
 
 function app(configdata = {}, enclosingHtmlDivElement) {
-  // ──────────────────────────────────────────────
-  // 0. Ladeanimation anzeigen
-  // ──────────────────────────────────────────────
-  enclosingHtmlDivElement.innerHTML = `
-    <div class="d-flex justify-content-center align-items-center" style="min-height:200px;">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Lade Haushaltsdaten…</span>
-      </div>
-      <span class="ms-3 fs-5 text-muted">Lade Haushaltsdaten…</span>
-    </div>`;
-
   const apiUrl = configdata.apiurl || configdata.apiUrl || "";
   const appTitel = configdata.titel || "Offener Haushalt";
   const filterJahr = configdata.haushaltsjahr
     ? String(configdata.haushaltsjahr)
     : null;
 
+  // ──────────────────────────────────────────────
+  // 0. Ladeanimation mit Fortschrittsbalken
+  // ──────────────────────────────────────────────
+  const _loadFilename = (() => {
+    try {
+      const u = new URL(apiUrl);
+      const segments = u.pathname.split("/").filter(Boolean);
+      const last = segments[segments.length - 1] || "";
+      // Direkte Datei mit bekannter Endung
+      if (/\.(json|csv|xlsx?|xml)$/i.test(last)) return last;
+      // CKAN: resource_id im Query-Parameter
+      const resourceId = u.searchParams.get("resource_id");
+      if (resourceId) return `Datensatz ${resourceId.slice(0, 8)}\u2026`;
+      // ODS / andere APIs: letzten zwei Pfadsegmente, ohne generische Endpunktnamen
+      const meaningful = segments.filter(
+        (s) =>
+          !/^(api|v\d+|action|datastore_search|records|json|csv)$/i.test(s),
+      );
+      if (meaningful.length) return meaningful.slice(-2).join("/");
+      // Fallback: Hostname
+      return u.hostname;
+    } catch {
+      return apiUrl;
+    }
+  })();
+  enclosingHtmlDivElement.innerHTML = `
+    <div class="d-flex flex-column align-items-center justify-content-center py-5"
+         style="min-height:240px;">
+      <div style="width:100%; max-width:480px; padding:0 1rem;">
+        <div class="mb-2 text-muted small text-truncate" title="${escapeHtml(apiUrl)}">
+          Lade: <span class="fw-semibold text-body">${escapeHtml(_loadFilename)}</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <span id="oh-load-msg" class="text-muted small">Verbinde mit Server\u2026</span>
+          <span id="oh-load-pct" class="text-muted small fw-semibold">0\u202f%</span>
+        </div>
+        <div class="progress" style="height:10px; border-radius:6px;">
+          <div id="oh-load-bar"
+               class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+               role="progressbar"
+               style="width:0%; transition:width 0.35s ease;"
+               aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <div id="oh-load-detail" class="text-center text-muted mt-2"
+             style="font-size:0.78rem; min-height:1.4em;"></div>
+      </div>
+    </div>`;
+
+  /** Aktualisiert Fortschrittsbalken, Beschriftung und Detailzeile */
+  function setProgress(pct, msg, detail) {
+    const bar = enclosingHtmlDivElement.querySelector("#oh-load-bar");
+    const msgEl = enclosingHtmlDivElement.querySelector("#oh-load-msg");
+    const pctEl = enclosingHtmlDivElement.querySelector("#oh-load-pct");
+    const detEl = enclosingHtmlDivElement.querySelector("#oh-load-detail");
+    if (bar) {
+      bar.style.width = pct + "%";
+      bar.setAttribute("aria-valuenow", pct);
+    }
+    if (msgEl && msg !== undefined) msgEl.textContent = msg;
+    if (pctEl) pctEl.textContent = Math.round(pct) + "\u202f%";
+    if (detEl && detail !== undefined) detEl.textContent = detail;
+  }
+
   if (!apiUrl) {
     enclosingHtmlDivElement.innerHTML = `
       <div class="alert alert-warning mt-4">
         <strong>Konfigurationsfehler:</strong> Keine API-URL angegeben
-        (de>apiurl</code> fehlt in der config.json).
+        (<code>apiurl</code> fehlt in der config.json).
       </div>`;
     return null;
   }
@@ -55,27 +107,46 @@ function app(configdata = {}, enclosingHtmlDivElement) {
   // ──────────────────────────────────────────────
   // 1. Daten laden
   // ──────────────────────────────────────────────
+  setProgress(10, "Verbinde mit Server\u2026", "");
+
   fetch(apiUrl)
     .then((response) => {
       if (!response.ok)
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      setProgress(25, "Verbunden \u2013 lade Daten\u2026", "");
+
       const ct = response.headers.get("content-type") || "";
-      if (ct.includes("csv") || apiUrl.toLowerCase().endsWith(".csv")) {
-        return response.text().then((text) => parseCsv(text));
-      }
-      return response.json().then((json) => parseJson(json));
+      const isCSV = ct.includes("csv") || apiUrl.toLowerCase().endsWith(".csv");
+      const contentLength = parseInt(
+        response.headers.get("content-length") || "0",
+      );
+
+      return ladeBody(response, contentLength, (progress) => {
+        const detail = contentLength
+          ? `${formatBytes(Math.round(progress * contentLength))} von ${formatBytes(contentLength)}`
+          : "";
+        setProgress(25 + Math.round(progress * 45), "Lade Daten\u2026", detail);
+      }).then((text) => {
+        setProgress(70, "Verarbeite Daten\u2026", "");
+        if (isCSV) return parseCsv(text);
+        return parseJson(JSON.parse(text));
+      });
     })
     .then((records) => {
       if (!records || records.length === 0)
         throw new Error("Keine Datensätze gefunden.");
-      renderApp(records, enclosingHtmlDivElement, appTitel, filterJahr);
+      setProgress(90, "Erstelle Visualisierungen\u2026", "");
+      // Kurzer Timeout, damit der 90%-Balken sichtbar wird
+      setTimeout(() => {
+        renderApp(records, enclosingHtmlDivElement, appTitel, filterJahr);
+      }, 80);
     })
     .catch((err) => {
       enclosingHtmlDivElement.innerHTML = `
         <div class="alert alert-danger mt-4">
           <strong>Fehler beim Laden der Daten:</strong> ${escapeHtml(err.message)}
           <hr>
-          <small>URL: de>${escapeHtml(apiUrl)}</code></small>
+          <small>URL: <code>${escapeHtml(apiUrl)}</code></small>
         </div>`;
     });
 
@@ -755,6 +826,44 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+// ══════════════════════════════════════════════════════════════
+// LADE-HILFSFUNKTIONEN
+// ══════════════════════════════════════════════════════════════
+
+/**
+ * Liest den Response-Body als Text und meldet den Download-Fortschritt
+ * per onProgress(0..1) zurück (nur wenn Content-Length bekannt).
+ */
+function ladeBody(response, contentLength, onProgress) {
+  if (!response.body || !contentLength) {
+    onProgress(0.5);
+    return response.text();
+  }
+
+  const reader = response.body.getReader();
+  const chunks = [];
+  let received = 0;
+
+  function pump() {
+    return reader.read().then(({ done, value }) => {
+      if (done) return new Blob(chunks).text();
+      chunks.push(value);
+      received += value.length;
+      onProgress(Math.min(received / contentLength, 1));
+      return pump();
+    });
+  }
+
+  return pump();
+}
+
+/** Formatiert Bytes lesbar (B / KB / MB) */
+function formatBytes(bytes) {
+  if (bytes >= 1_000_000) return (bytes / 1_000_000).toFixed(1) + "\u202fMB";
+  if (bytes >= 1_000) return Math.round(bytes / 1_000) + "\u202fKB";
+  return bytes + "\u202fB";
 }
 
 // ══════════════════════════════════════════════════════════════
