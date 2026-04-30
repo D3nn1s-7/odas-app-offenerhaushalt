@@ -16,9 +16,19 @@
     "Unterstützte Datenformate: CKAN Datastore JSON, OpenDataSoft API v1/v2, direktes JSON-Array, CSV.",
     ""
   ],
-  "tags-funktion": ["Haushalt", "Finanzen", "Visualisierung"],
-  "tags-dateityp": ["JSON", "CSV"],
-  "tags-datenart": ["Haushaltsdaten", "Finanzdaten"],
+  "tags-funktion": [
+    "Haushalt",
+    "Finanzen",
+    "Visualisierung"
+  ],
+  "tags-dateityp": [
+    "JSON",
+    "CSV"
+  ],
+  "tags-datenart": [
+    "Haushaltsdaten",
+    "Finanzdaten"
+  ],
   "screenshots": [
     "/assets/Desktop_Screenshot.png",
     "/assets/Desktop_Screenshot_2.png"
@@ -140,7 +150,10 @@
       "format": {
         "typ": "markdown"
       },
-      "default": ["_multiline_", "Alle Daten sind geschützt."],
+      "default": [
+        "_multiline_",
+        "Alle Daten sind geschützt."
+      ],
       "erforderlich": "ja"
     },
     "urlDaten": {
@@ -190,10 +203,18 @@
       "hilfe": "Angabe der App-Sprache",
       "format": {
         "typ": "dropdown",
-        "optionen": ["de"],
+        "optionen": [
+          "de"
+        ],
         "default": "de"
       },
       "erforderlich": "ja"
     }
+  },
+  "daten": {
+    "beschreibung": "Die Offener Haushalt-App verarbeitet konfigurierbare Open-Data-Ressourcen aus dem Open Data Portal (z.B. JSON- oder CSV-Endpunkte).",
+    "schema": "",
+    "beispiel": "",
+    "beispiel-url": ""
   }
 }
