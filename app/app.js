@@ -138,7 +138,7 @@ function app(configdata = {}, enclosingHtmlDivElement) {
       setProgress(90, "Erstelle Visualisierungen\u2026", "");
       // Kurzer Timeout, damit der 90%-Balken sichtbar wird
       setTimeout(() => {
-        renderApp(records, enclosingHtmlDivElement, appTitel, filterJahr);
+        renderApp(records, enclosingHtmlDivElement, appTitel, filterJahr, configdata);
       }, 80);
     })
     .catch((err) => {
@@ -307,7 +307,12 @@ function parseBetrag(val) {
 // RENDERING
 // ══════════════════════════════════════════════════════════════
 
-function renderApp(allRecords, container, appTitel, filterJahr) {
+function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
+  const freshnessHtml = configdata.datenStand
+    ? '<div class="text-end mb-2"><small class="text-muted">' +
+      escapeHtml(String(configdata.datenStand)) +
+      "</small></div>"
+    : "";
   const jahre = [
     ...new Set(allRecords.map((r) => r.jahr).filter(Boolean)),
   ].sort();
@@ -361,6 +366,7 @@ function renderApp(allRecords, container, appTitel, filterJahr) {
       </div>
     </div>
 
+    ${freshnessHtml}
     <!-- KPI-Kacheln -->
     <div class="row g-3 mb-4" id="oh-kpis"></div>
 
@@ -410,7 +416,8 @@ function renderApp(allRecords, container, appTitel, filterJahr) {
           </table>
         </div>
       </div>
-    </div>`;
+    </div>
+    ${renderWeitereInfos(configdata)}${renderMethodikbox(configdata)}`;
 
   // ── State ──────────────────────────────────────
   let currentJahr = aktivesJahr;
@@ -538,7 +545,7 @@ function renderApp(allRecords, container, appTitel, filterJahr) {
         <div class="card border-success h-100">
           <div class="card-body text-center py-3">
             <div class="text-success fw-bold fs-5">${formatEuro(totalEinnahmen)}</div>
-            <div class="text-muted small">Gesamte Erträge/Einnahmen</div>
+            <div class="text-muted small">Gesamte Erträge/Einnahmen</div>\n              ${kpiContext(configdata.kpiKontext1, "1")}
           </div>
         </div>
       </div>
@@ -546,7 +553,7 @@ function renderApp(allRecords, container, appTitel, filterJahr) {
         <div class="card border-danger h-100">
           <div class="card-body text-center py-3">
             <div class="text-danger fw-bold fs-5">${formatEuro(totalAusgaben)}</div>
-            <div class="text-muted small">Gesamter Aufwand/Ausgaben</div>
+            <div class="text-muted small">Gesamter Aufwand/Ausgaben</div>\n              ${kpiContext(configdata.kpiKontext2, "2")}
           </div>
         </div>
       </div>
@@ -556,7 +563,7 @@ function renderApp(allRecords, container, appTitel, filterJahr) {
             <div class="text-${saldo >= 0 ? "primary" : "warning"} fw-bold fs-5">
               ${saldo >= 0 ? "+" : ""}${formatEuro(saldo)}
             </div>
-            <div class="text-muted small">Saldo</div>
+            <div class="text-muted small">Saldo</div>\n              ${kpiContext(configdata.kpiKontext3, "3")}
           </div>
         </div>
       </div>
@@ -564,7 +571,7 @@ function renderApp(allRecords, container, appTitel, filterJahr) {
         <div class="card border-secondary h-100">
           <div class="card-body text-center py-3">
             <div class="text-secondary fw-bold fs-5">${anzahlBereiche}</div>
-            <div class="text-muted small">Produktbereiche</div>
+            <div class="text-muted small">Produktbereiche</div>\n              ${kpiContext(configdata.kpiKontext4, "4")}
           </div>
         </div>
       </div>`;
@@ -826,6 +833,61 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+
+  /* ── Schale 4: KPI Kontext ── */
+  function kpiContext(kontext, id) {
+    var text = String(kontext || "").trim();
+    if (!text) return "";
+    var targetId = "oh-kpi-kontext-" + id;
+    return (
+      '<button class="oh-kpi-info-toggle collapsed" type="button" ' +
+      'data-bs-toggle="collapse" data-bs-target="#' + targetId + '" ' +
+      'aria-expanded="false" aria-controls="' + targetId + '" ' +
+      'aria-label="Erklärung zu diesem Wert">' +
+      '<span class="oh-kpi-info-icon" aria-hidden="true">ⓘ</span>' +
+      "</button>" +
+      '<div id="' + targetId + '" class="collapse">' +
+      '<div class="oh-kpi-kontext">' + escapeHtml(text) + "</div>" +
+      "</div>"
+    );
+  }
+
+  /* ── Schale 4: Methodikbox ── */
+  function renderMethodikbox(cfg) {
+    var hinweis = ((cfg && cfg.datenquelleHinweis) || "").trim();
+    var stand = ((cfg && cfg.datenStand) || "").trim();
+    if (!hinweis && !stand) return "";
+    var standHtml = stand
+      ? '<p class="text-muted small mb-2">' + escapeHtml(stand) + "</p>"
+      : "";
+    return (
+      '<section class="oh-methodik mt-3">' +
+      '<button class="oh-methodik-toggle collapsed" type="button" ' +
+      'data-bs-toggle="collapse" data-bs-target="#oh-methodik-body" ' +
+      'aria-expanded="false" aria-controls="oh-methodik-body">' +
+      '<h2 class="h5 mb-0">Methodik &amp; Datenquelle</h2>' +
+      '<span class="oh-methodik-chevron" aria-hidden="true">&#9662;</span>' +
+      "</button>" +
+      '<div id="oh-methodik-body" class="collapse">' +
+      '<div class="oh-methodik-content">' +
+      standHtml +
+      hinweis +
+      "</div></div></section>"
+    );
+  }
+
+function renderWeitereInfos(cfg) {
+  const links = String((cfg && cfg.weiterfuehrendeLinks) || "").trim();
+  if (!links) return "";
+  return (
+    '<section class="oh-weitere-infos card mt-4"><div class="card-body">' +
+    '<h6 class="card-title fw-semibold">Weitere Informationen</h6>' +
+    '<div class="oh-weitere-infos-content">' +
+    links +
+    "</div></div></section>"
+  );
 }
 
 // ══════════════════════════════════════════════════════════════

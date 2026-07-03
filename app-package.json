@@ -3,19 +3,21 @@
   "app-entwickler-name": "ondics-gmbh",
   "name-in-url": "offener-haushalt",
   "name": "Offener Haushalt",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "odas-app-icon": "assets/odas-app-icon.svg",
   "app-icon": "assets/odas-app-icon.svg",
   "kurzbeschreibung": "Interaktive Visualisierung des kommunalen Haushalts – Einnahmen und Ausgaben nach Produktbereichen.",
-  "beschreibung": [
-    "_multiline_",
-    "Die Offener-Haushalt-App visualisiert den kommunalen Ergebnishaushalt interaktiv. ",
-    "Einnahmen (Erträge) und Ausgaben (Aufwand) werden nach Produktbereichen und Produktgruppen ",
-    "als Balkendiagramm und Detailtabelle dargestellt. Per Klick auf einen Produktbereich lassen sich ",
-    "die enthaltenen Produktgruppen als Drill-Down anzeigen. ",
-    "Unterstützte Datenformate: CKAN Datastore JSON, OpenDataSoft API v1/v2, direktes JSON-Array, CSV.",
-    ""
-  ],
+    "beschreibung": [
+      "_multiline_",
+      "Die Offener-Haushalt-App visualisiert den kommunalen Ergebnishaushalt interaktiv. ",
+      "Einnahmen (Erträge) und Ausgaben (Aufwand) werden nach Produktbereichen und Produktgruppen ",
+      "als Balkendiagramm und Detailtabelle dargestellt. Per Klick auf einen Produktbereich lassen sich ",
+      "die enthaltenen Produktgruppen als Drill-Down anzeigen. ",
+      "Unterstützte Datenformate: CKAN Datastore JSON, OpenDataSoft API v1/v2, direktes JSON-Array, CSV.",
+      "## Für wen ist diese App?",
+      "Diese App macht kommunale Haushaltsdaten transparent. Sie richtet sich an Bürger:innen, Journalist:innen und Kommunalpolitiker:innen, die verstehen möchten, wofür ihre Stadt Geld ausgibt.",
+      ""
+    ],
   "tags-funktion": [
     "Haushalt",
     "Finanzen",
@@ -186,6 +188,24 @@
       "default": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
       "beispiel": "",
       "erforderlich": "ja"
+    },
+    "weiterfuehrendeLinks": {
+      "label": "Weiterführende Links",
+      "hilfe": "Verwandte Datensätze / Hintergrundquellen (HTML/Markdown). Leer = ausgeblendet.",
+      "format": {
+        "typ": "markdown"
+      },
+      "default": "<ul><li><a href='{{{odp.url}}}' target='_blank'>Zum Open Data Portal</a></li><li><a href='{{appinstanz.urlDaten}}' target='_blank'>Zum Haushaltsdatensatz</a></li></ul>",
+      "erforderlich": "nein"
+    },
+    "datenStand": {
+      "label": "Datenstand",
+      "hilfe": "Freitext-Hinweis zum Stand der Daten. Leer = ausgeblendet.",
+      "format": {
+        "typ": "string"
+      },
+      "default": "Stand: abhängig von Datenquelle",
+      "erforderlich": "nein"
     },
     "haushaltsjahr": {
       "label": "Haushaltsjahr filtern",
