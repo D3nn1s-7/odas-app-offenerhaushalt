@@ -7,17 +7,17 @@
   "odas-app-icon": "assets/odas-app-icon.svg",
   "app-icon": "assets/odas-app-icon.svg",
   "kurzbeschreibung": "Interaktive Visualisierung des kommunalen Haushalts – Einnahmen und Ausgaben nach Produktbereichen.",
-    "beschreibung": [
-      "_multiline_",
-      "Die Offener-Haushalt-App visualisiert den kommunalen Ergebnishaushalt interaktiv. ",
-      "Einnahmen (Erträge) und Ausgaben (Aufwand) werden nach Produktbereichen und Produktgruppen ",
-      "als Balkendiagramm und Detailtabelle dargestellt. Per Klick auf einen Produktbereich lassen sich ",
-      "die enthaltenen Produktgruppen als Drill-Down anzeigen. ",
-      "Unterstützte Datenformate: CKAN Datastore JSON, OpenDataSoft API v1/v2, direktes JSON-Array, CSV.",
-      "## Für wen ist diese App?",
-      "Diese App macht kommunale Haushaltsdaten transparent. Sie richtet sich an Bürger:innen, Journalist:innen und Kommunalpolitiker:innen, die verstehen möchten, wofür ihre Stadt Geld ausgibt.",
-      ""
-    ],
+  "beschreibung": [
+    "_multiline_",
+    "Die Offener-Haushalt-App visualisiert den kommunalen Ergebnishaushalt interaktiv. ",
+    "Einnahmen (Erträge) und Ausgaben (Aufwand) werden nach Produktbereichen und Produktgruppen ",
+    "als Balkendiagramm und Detailtabelle dargestellt. Per Klick auf einen Produktbereich lassen sich ",
+    "die enthaltenen Produktgruppen als Drill-Down anzeigen. ",
+    "Unterstützte Datenformate: CKAN Datastore JSON, OpenDataSoft API v1/v2, direktes JSON-Array, CSV.",
+    "## Für wen ist diese App?",
+    "Diese App macht kommunale Haushaltsdaten transparent. Sie richtet sich an Bürger:innen, Journalist:innen und Kommunalpolitiker:innen, die verstehen möchten, wofür ihre Stadt Geld ausgibt.",
+    ""
+  ],
   "tags-funktion": [
     "Haushalt",
     "Finanzen",
@@ -229,6 +229,55 @@
         "default": "de"
       },
       "erforderlich": "ja"
+    },
+    "datenquelleHinweis": {
+      "label": "Methodik / Datenquelle-Hinweis",
+      "hilfe": "Herkunft, Erhebungsmethode und Limitierungen (HTML/Markdown). Leer = ausgeblendet.",
+      "format": {
+        "typ": "markdown"
+      },
+      "default": "<p>Die Haushaltsdaten werden aus verschiedenen Quellformaten (CKAN Datastore, OpenDataSoft v1/v2, JSON, CSV) automatisch erkannt. Spaltennamen werden über Fuzzy-Matching zugeordnet (z.B. Ertraege/Einnahmen, Aufwand/Ausgaben). Einnahmen und Ausgaben werden anhand von Schlüsselwörtern klassifiziert. Der Saldo berechnet sich als Differenz zwischen Erträgen und Aufwand. Die Anzahl der Produktbereiche wird aus den eindeutigen Bereichsnamen ermittelt.</p>",
+      "erforderlich": "nein"
+    },
+    "kpiKontext1": {
+      "label": "KPI-Erklärung 1: Gesamte Erträge",
+      "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
+      "format": {
+        "typ": "string",
+        "laenge": 250
+      },
+      "default": "",
+      "erforderlich": "nein"
+    },
+    "kpiKontext2": {
+      "label": "KPI-Erklärung 2: Gesamter Aufwand",
+      "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
+      "format": {
+        "typ": "string",
+        "laenge": 250
+      },
+      "default": "",
+      "erforderlich": "nein"
+    },
+    "kpiKontext3": {
+      "label": "KPI-Erklärung 3: Saldo",
+      "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
+      "format": {
+        "typ": "string",
+        "laenge": 250
+      },
+      "default": "",
+      "erforderlich": "nein"
+    },
+    "kpiKontext4": {
+      "label": "KPI-Erklärung 4: Produktbereiche",
+      "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
+      "format": {
+        "typ": "string",
+        "laenge": 250
+      },
+      "default": "",
+      "erforderlich": "nein"
     }
   },
   "daten": {
