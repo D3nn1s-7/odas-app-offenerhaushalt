@@ -20,6 +20,12 @@ Single Page Application mit Logo, Menü, Impressum/Datenschutz/Kontakt-Seiten un
 
 ---
 
+## Für wen ist diese App?
+
+Diese App macht kommunale Haushaltsdaten transparent. Sie richtet sich an Bürger:innen, Journalist:innen und Kommunalpolitiker:innen, die verstehen möchten, wofür ihre Stadt Geld ausgibt.
+
+---
+
 ## Datenformat
 
 Unterstützt **JSON** und **CSV** mit automatischer Formaterkennung:

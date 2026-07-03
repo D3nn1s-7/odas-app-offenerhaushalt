@@ -8,15 +8,67 @@
   "beschreibung": [
     "Diese App visualisiert den kommunalen Haushalt interaktiv. ",
     "Einnahmen und Ausgaben werden nach Produktbereichen und Produktgruppen dargestellt. ",
+    "## Für wen ist diese App?",
+    "Diese App macht kommunale Haushaltsdaten transparent. Sie richtet sich an Bürger:innen, Journalist:innen und Kommunalpolitiker:innen, die verstehen möchten, wofür ihre Stadt Geld ausgibt.",
     "## Datenquelle",
     "Die Daten stammen aus dem Open Data Portal der Kommune."
   ],
-  "kontakt": ["Bei Fragen wenden Sie sich bitte an die zuständige Stelle."],
-  "impressum": ["Angaben gemäß § 5 TMG"],
+  "kontakt": [
+    "Bei Fragen wenden Sie sich bitte an die zuständige Stelle."
+  ],
+  "impressum": [
+    "Angaben gemäß § 5 TMG"
+  ],
   "datenschutz": "Informationen zum Datenschutz finden Sie auf der Website der Kommune.",
   "urlODP": "",
   "urlDaten": "",
-  "fusszeile": ["(C) Copyright 2026 | ", "App-Entwickler: Ondics GmbH"],
+  "fusszeile": [
+    "(C) Copyright 2026 | ",
+    "App-Entwickler: Ondics GmbH"
+  ],
   "apiurl": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
-  "sprache": "de"
+  "weiterfuehrendeLinks": "<ul><li><a href='https://opendata.rhein-kreis-neuss.de/' target='_blank'>Open Data Portal Rhein-Kreis Neuss</a></li><li><a href='https://opendata.rhein-kreis-neuss.de/dataset/rhein-kreis-neuss-offener-haushalt' target='_blank'>Zum Haushaltsdatensatz</a></li></ul>",
+  "datenStand": "Stand: abhängig von Datenquelle",
+  "sprache": "de",
+  "datenquelleHinweis": "Multi-Format-Erkennung (CKAN Datastore API, OpenDataSoft v1/v2 API, JSON-Array, CSV), Fuzzy-Spalten-Matching (Alias-Erkennung für Produktbereich/Produktgruppe/Betrag/Jahr), Einnahmen/Ausgaben-Klassifizierung anhand von Schlüsselwörtern (Ertrag/Aufwand).",
+  "kpiKontext1": {
+    "label": "KPI Kontext 1",
+    "hilfe": "Erklärungstext für KPI-Kachel 1",
+    "format": {
+      "typ": "string",
+      "laenge": 250
+    },
+    "default": "",
+    "erforderlich": "nein"
+  },
+  "kpiKontext2": {
+    "label": "KPI Kontext 2",
+    "hilfe": "Erklärungstext für KPI-Kachel 2",
+    "format": {
+      "typ": "string",
+      "laenge": 250
+    },
+    "default": "",
+    "erforderlich": "nein"
+  },
+  "kpiKontext3": {
+    "label": "KPI Kontext 3",
+    "hilfe": "Erklärungstext für KPI-Kachel 3",
+    "format": {
+      "typ": "string",
+      "laenge": 250
+    },
+    "default": "",
+    "erforderlich": "nein"
+  },
+  "kpiKontext4": {
+    "label": "KPI Kontext 4",
+    "hilfe": "Erklärungstext für KPI-Kachel 4",
+    "format": {
+      "typ": "string",
+      "laenge": 250
+    },
+    "default": "",
+    "erforderlich": "nein"
+  }
 }
