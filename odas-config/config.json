@@ -6,12 +6,19 @@
   "brandingCSS": "",
   "brandingCSSFile": "",
   "beschreibung": [
-    "Diese App visualisiert den kommunalen Haushalt interaktiv. ",
-    "Einnahmen und Ausgaben werden nach Produktbereichen und Produktgruppen dargestellt. ",
-    "## Für wen ist diese App?",
-    "Diese App macht kommunale Haushaltsdaten transparent. Sie richtet sich an Bürger:innen, Journalist:innen und Kommunalpolitiker:innen, die verstehen möchten, wofür ihre Stadt Geld ausgibt.",
-    "## Datenquelle",
-    "Die Daten stammen aus dem Open Data Portal der Kommune."
+    "<p>Die Offener-Haushalt-App visualisiert kommunale Haushaltsdaten verständlich und interaktiv.</p>",
+    "<p>Einnahmen und Ausgaben werden nach Produktbereichen und Produktgruppen dargestellt, sodass finanzielle Schwerpunkte besser nachvollziehbar werden.</p>",
+    "<h3>Inhalte</h3>",
+    "<p>Die App zeigt Kennzahlen, Diagramme und Tabellen zum Ergebnishaushalt. Filter und Gruppierungen helfen dabei, einzelne Bereiche gezielt zu untersuchen.</p>",
+    "<h3>Nutzung</h3>",
+    "<p>Nutzen Sie die Diagramme für den Überblick und die Tabelle für Details. Die App macht Haushaltsstrukturen transparenter, ersetzt aber keine Haushaltsberatung oder amtliche Beschlussvorlagen.</p>",
+    "<h3>Für wen ist diese App?</h3>",
+    "<p>Die App richtet sich an Bürger:innen, Kommunalpolitik, Verwaltung, Medien und Initiativen, die Haushaltsdaten verständlich betrachten möchten. Besondere Datenkenntnisse sind für die Nutzung nicht erforderlich.</p>",
+    "<h3>Datenquelle</h3>",
+    "<p>Die Haushaltsdaten werden aus einer konfigurierten OpenDataSoft-Quelle geladen und in der App normalisiert.</p>",
+    "<ul><li><strong>Open Data Portal:</strong> <a href=\"https://opendata.rhein-kreis-neuss.de/\" target=\"_blank\" rel=\"noopener\">Open Data Rhein-Kreis Neuss</a></li><li><strong>Datensatz:</strong> <a href=\"https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/\" target=\"_blank\" rel=\"noopener\">Offener Haushalt</a></li><li><strong>Ressource/API-Endpunkt:</strong> <a href=\"https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&amp;timezone=Europe%2FBerlin\" target=\"_blank\" rel=\"noopener\">JSON-Export</a></li></ul>",
+    "<h3>Open Data App Store</h3>",
+    "<p>Diese App ist für den Open Data App Store vorbereitet und kann mit kommunalen Haushaltsdaten anderer Verwaltungen konfiguriert werden.</p>"
   ],
   "kontakt": [
     "Bei Fragen wenden Sie sich bitte an die zuständige Stelle."
@@ -27,48 +34,12 @@
     "App-Entwickler: Ondics GmbH"
   ],
   "apiurl": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
-  "weiterfuehrendeLinks": "<ul><li><a href='https://opendata.rhein-kreis-neuss.de/' target='_blank'>Open Data Portal Rhein-Kreis Neuss</a></li><li><a href='https://opendata.rhein-kreis-neuss.de/dataset/rhein-kreis-neuss-offener-haushalt' target='_blank'>Zum Haushaltsdatensatz</a></li></ul>",
+  "weiterfuehrendeLinks": "<ul><li><a href=\"https://opendata.rhein-kreis-neuss.de/\" target=\"_blank\" rel=\"noopener\">Open Data Rhein-Kreis Neuss</a></li><li><a href=\"https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/\" target=\"_blank\" rel=\"noopener\">Datensatz Offener Haushalt</a></li><li><a href=\"https://open-data-app-store.de\" target=\"_blank\" rel=\"noopener\">Open Data App Store</a></li></ul>",
   "datenStand": "Stand: abhängig von Datenquelle",
   "sprache": "de",
-  "datenquelleHinweis": "Multi-Format-Erkennung (CKAN Datastore API, OpenDataSoft v1/v2 API, JSON-Array, CSV), Fuzzy-Spalten-Matching (Alias-Erkennung für Produktbereich/Produktgruppe/Betrag/Jahr), Einnahmen/Ausgaben-Klassifizierung anhand von Schlüsselwörtern (Ertrag/Aufwand).",
-  "kpiKontext1": {
-    "label": "KPI Kontext 1",
-    "hilfe": "Erklärungstext für KPI-Kachel 1",
-    "format": {
-      "typ": "string",
-      "laenge": 250
-    },
-    "default": "",
-    "erforderlich": "nein"
-  },
-  "kpiKontext2": {
-    "label": "KPI Kontext 2",
-    "hilfe": "Erklärungstext für KPI-Kachel 2",
-    "format": {
-      "typ": "string",
-      "laenge": 250
-    },
-    "default": "",
-    "erforderlich": "nein"
-  },
-  "kpiKontext3": {
-    "label": "KPI Kontext 3",
-    "hilfe": "Erklärungstext für KPI-Kachel 3",
-    "format": {
-      "typ": "string",
-      "laenge": 250
-    },
-    "default": "",
-    "erforderlich": "nein"
-  },
-  "kpiKontext4": {
-    "label": "KPI Kontext 4",
-    "hilfe": "Erklärungstext für KPI-Kachel 4",
-    "format": {
-      "typ": "string",
-      "laenge": 250
-    },
-    "default": "",
-    "erforderlich": "nein"
-  }
+  "datenquelleHinweis": "<p>Die Haushaltsdaten werden aus einer konfigurierten OpenDataSoft-Quelle geladen und nach Produktbereichen sowie Produktgruppen visualisiert. Die App stellt veröffentlichte Haushaltswerte transparent dar, ersetzt aber keine Haushaltsberatung oder amtliche Beschlussvorlage.</p>",
+  "kpiKontext1": "Summe aller Erträge und Einnahmen des Haushalts — z.B. Steuern, Gebühren, Zuweisungen. Zeigt, wie viel Geld insgesamt eingenommen wird.",
+  "kpiKontext2": "Summe aller Aufwendungen und Ausgaben — z.B. Personal, Infrastruktur, Soziales. Zeigt, wofür das Geld verwendet wird.",
+  "kpiKontext3": "Differenz zwischen Erträgen und Aufwendungen. Positiv = Überschuss, negativ = Defizit. Ein zentraler Indikator der Haushaltslage.",
+  "kpiKontext4": "Anzahl der verschiedenen Produktbereiche im Haushaltsplan (z.B. Schule, Verkehr, Soziales). Zeigt die strukturelle Gliederung."
 }
