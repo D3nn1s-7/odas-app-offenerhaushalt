@@ -25,6 +25,84 @@
  * Spaltenbezeichnungen werden flexibel per Alias-Matching erkannt.
  */
 
+function isOdasProxyEnabled(configdata = {}) {
+  return String(configdata.proxyAktiv || "").trim().toLowerCase() === "ja";
+}
+
+function extractPathFromUrl(url) {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.pathname + parsedUrl.search;
+  } catch (_error) {
+    return String(url || "");
+  }
+}
+
+function getOdasAppBasePath(pathname) {
+  let appPath =
+    pathname === undefined
+      ? typeof window !== "undefined"
+        ? window.location.pathname
+        : "/"
+      : String(pathname || "/");
+
+  if (!appPath.endsWith("/")) {
+    const lastSlashIndex = appPath.lastIndexOf("/");
+    const lastSegment = appPath.substring(lastSlashIndex + 1);
+    if (lastSegment.includes(".")) {
+      appPath = appPath.substring(0, lastSlashIndex + 1);
+    }
+  }
+
+  return appPath.replace(/\/+$/, "");
+}
+
+function getOdasProxyEndpoint(targetUrl, pathname) {
+  const appPath = getOdasAppBasePath(pathname);
+  return `${appPath}/odp-data?path=${encodeURIComponent(
+    extractPathFromUrl(targetUrl),
+  )}`;
+}
+
+async function fetchViaOdasProxy(targetUrl) {
+  const response = await fetch(getOdasProxyEndpoint(targetUrl), {
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error(`ODAS-Proxy-Fehler: HTTP ${response.status}`);
+  }
+
+  const proxyData = await response.json();
+  if (!proxyData || typeof proxyData.content !== "string") {
+    throw new Error("ODAS-Proxy-Antwort enthält keinen content-String.");
+  }
+
+  return proxyData.content;
+}
+
+async function fetchOdasResource(targetUrl, configdata = {}) {
+  if (isOdasProxyEnabled(configdata)) {
+    return fetchViaOdasProxy(targetUrl);
+  }
+
+  try {
+    const response = await fetch(targetUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return response.text();
+  } catch (error) {
+    throw new Error(
+      `Direkter Datenabruf fehlgeschlagen (${error.message}). Bitte prüfen Sie die Daten-URL und die CORS-Freigabe der Datenquelle.`,
+    );
+  }
+}
+
+async function fetchOdasJson(targetUrl, configdata = {}) {
+  return JSON.parse(await fetchOdasResource(targetUrl, configdata));
+}
+
 function app(configdata = {}, enclosingHtmlDivElement) {
   const apiUrl = configdata.apiurl || configdata.apiUrl || "";
   const appTitel = configdata.titel || "Offener Haushalt";
@@ -109,29 +187,7 @@ function app(configdata = {}, enclosingHtmlDivElement) {
   // ──────────────────────────────────────────────
   setProgress(10, "Verbinde mit Server\u2026", "");
 
-  fetch(apiUrl)
-    .then((response) => {
-      if (!response.ok)
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      setProgress(25, "Verbunden \u2013 lade Daten\u2026", "");
-
-      const ct = response.headers.get("content-type") || "";
-      const isCSV = ct.includes("csv") || apiUrl.toLowerCase().endsWith(".csv");
-      const contentLength = parseInt(
-        response.headers.get("content-length") || "0",
-      );
-
-      return ladeBody(response, contentLength, (progress) => {
-        const detail = contentLength
-          ? `${formatBytes(Math.round(progress * contentLength))} von ${formatBytes(contentLength)}`
-          : "";
-        setProgress(25 + Math.round(progress * 45), "Lade Daten\u2026", detail);
-      }).then((text) => {
-        setProgress(70, "Verarbeite Daten\u2026", "");
-        if (isCSV) return parseCsv(text);
-        return parseJson(JSON.parse(text));
-      });
-    })
+  ladeDaten()
     .then((records) => {
       if (!records || records.length === 0)
         throw new Error("Keine Datensätze gefunden.");
@@ -149,6 +205,38 @@ function app(configdata = {}, enclosingHtmlDivElement) {
           <small>URL: <code>${escapeHtml(apiUrl)}</code></small>
         </div>`;
     });
+
+  // Daten laden: direkt mit Fortschrittsanzeige, ueber den ODAS-Proxy ohne.
+  async function ladeDaten() {
+    const istCsv = () =>
+      apiUrl.toLowerCase().endsWith(".csv");
+
+    if (isOdasProxyEnabled(configdata)) {
+      const text = await fetchViaOdasProxy(apiUrl);
+      setProgress(70, "Verarbeite Daten\u2026", "");
+      return istCsv() ? parseCsv(text) : parseJson(JSON.parse(text));
+    }
+
+    const response = await fetch(apiUrl);
+    if (!response.ok)
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    setProgress(25, "Verbunden \u2013 lade Daten\u2026", "");
+
+    const ct = response.headers.get("content-type") || "";
+    const isCSV = ct.includes("csv") || istCsv();
+    const contentLength = parseInt(
+      response.headers.get("content-length") || "0",
+    );
+
+    const text = await ladeBody(response, contentLength, (progress) => {
+      const detail = contentLength
+        ? `${formatBytes(Math.round(progress * contentLength))} von ${formatBytes(contentLength)}`
+        : "";
+      setProgress(25 + Math.round(progress * 45), "Lade Daten\u2026", detail);
+    });
+    setProgress(70, "Verarbeite Daten\u2026", "");
+    return isCSV ? parseCsv(text) : parseJson(JSON.parse(text));
+  }
 
   return null;
 }

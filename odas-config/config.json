@@ -1,5 +1,6 @@
 {
   "apiVersion": "1",
+  "proxyAktiv": "nein",
   "titel": "Offener Haushalt",
   "seitentitel": "Offener Haushalt",
   "icon": "{{{odp.logo}}}",
