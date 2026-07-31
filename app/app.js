@@ -104,7 +104,7 @@ async function fetchOdasJson(targetUrl, configdata = {}) {
 }
 
 function app(configdata = {}, enclosingHtmlDivElement) {
-  const apiUrl = configdata.apiurl || configdata.apiUrl || "";
+  const apiUrl = configdata.apiurl || "";
   const appTitel = configdata.titel || "Offener Haushalt";
   const filterJahr = configdata.haushaltsjahr
     ? String(configdata.haushaltsjahr)

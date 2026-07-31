@@ -3,7 +3,7 @@
   "proxyAktiv": "nein",
   "titel": "Offener Haushalt",
   "seitentitel": "Offener Haushalt",
-  "icon": "{{{odp.logo}}}",
+  "icon": "logo_ondics.png",
   "brandingCSS": "",
   "brandingCSSFile": "",
   "beschreibung": [
@@ -34,6 +34,7 @@
     "(C) Copyright 2026 | ",
     "App-Entwickler: Ondics GmbH"
   ],
+  "haushaltsjahr": "",
   "apiurl": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
   "weiterfuehrendeLinks": "<ul><li><a href=\"https://opendata.rhein-kreis-neuss.de/\" target=\"_blank\" rel=\"noopener\">Open Data Rhein-Kreis Neuss</a></li><li><a href=\"https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/\" target=\"_blank\" rel=\"noopener\">Datensatz Offener Haushalt</a></li><li><a href=\"https://open-data-app-store.de\" target=\"_blank\" rel=\"noopener\">Open Data App Store</a></li></ul>",
   "datenStand": "Stand: abhängig von Datenquelle",
