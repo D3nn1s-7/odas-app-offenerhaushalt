@@ -1050,7 +1050,7 @@ function addToHead() {
     }
     const script = document.createElement("script");
     script.src =
-      "https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js";
+      "vendor/chartjs/chart.umd.min.js";
     script.onload = resolve;
     script.onerror = () =>
       reject(new Error("Chart.js konnte nicht geladen werden."));
