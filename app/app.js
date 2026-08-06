@@ -626,7 +626,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
     const saldo = totalEinnahmen - totalAusgaben;
     const anzahlBereiche = new Set(records.map((r) => r.bereichNr)).size;
 
-    const kpiEl = document.getElementById("oh-kpis");
+    const kpiEl = container.querySelector("#oh-kpis");
     if (!kpiEl) return;
     kpiEl.innerHTML = `
       <div class="col-6 col-md-3">
@@ -670,11 +670,11 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
     const daten = aggregiereNachBereich(records);
     const labels = daten.map((d) => kuerze(d.label, 28));
 
-    const subtitleEl = document.getElementById("oh-chart-subtitle");
+    const subtitleEl = container.querySelector("#oh-chart-subtitle");
     if (subtitleEl)
       subtitleEl.textContent = `${currentJahr} · ${daten.length} Bereiche`;
 
-    const ctx = document.getElementById("oh-chart-bereich");
+    const ctx = container.querySelector("#oh-chart-bereich");
     if (!ctx) return;
 
     if (bereichChart) bereichChart.destroy();
@@ -744,15 +744,15 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
     const daten = aggregiereNachGruppe(bereichRecords);
     const labels = daten.map((d) => kuerze(d.label, 32));
 
-    const card = document.getElementById("oh-drilldown-card");
-    const titleEl = document.getElementById("oh-drilldown-title");
+    const card = container.querySelector("#oh-drilldown-card");
+    const titleEl = container.querySelector("#oh-drilldown-title");
     if (card) card.style.display = "";
     if (titleEl) titleEl.textContent = `Produktgruppen: ${bereichData.label}`;
 
     // Zur Karte scrollen
     card.scrollIntoView({ behavior: "smooth", block: "start" });
 
-    const ctx = document.getElementById("oh-chart-gruppe");
+    const ctx = container.querySelector("#oh-chart-gruppe");
     if (!ctx) return;
     if (gruppeChart) gruppeChart.destroy();
 
@@ -804,8 +804,8 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
   // ── Detailtabelle rendern ─────────────────────
   function renderTabelle(records) {
     const daten = aggregiereNachGruppe(records);
-    const tbody = document.getElementById("oh-table-body");
-    const countEl = document.getElementById("oh-table-count");
+    const tbody = container.querySelector("#oh-table-body");
+    const countEl = container.querySelector("#oh-table-count");
     if (!tbody) return;
 
     if (countEl) countEl.textContent = `${daten.length} Produktgruppen`;
@@ -843,7 +843,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
     renderTabelle(records);
 
     // Drill-Down schließen bei Filterwechsel
-    const card = document.getElementById("oh-drilldown-card");
+    const card = container.querySelector("#oh-drilldown-card");
     if (card) card.style.display = "none";
     if (gruppeChart) {
       gruppeChart.destroy();
@@ -852,27 +852,27 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
   }
 
   // ── Event-Listener ────────────────────────────
-  document.getElementById("oh-jahr-select")?.addEventListener("change", (e) => {
+  container.querySelector("#oh-jahr-select")?.addEventListener("change", (e) => {
     currentJahr = e.target.value;
     updateAll();
   });
 
-  document.querySelectorAll("input[name='oh-ansicht']").forEach((radio) => {
+  container.querySelectorAll("input[name='oh-ansicht']").forEach((radio) => {
     radio.addEventListener("change", (e) => {
       currentAnsicht = e.target.value;
       updateAll();
     });
   });
 
-  document.getElementById("oh-search")?.addEventListener("input", (e) => {
+  container.querySelector("#oh-search")?.addEventListener("input", (e) => {
     currentSearch = e.target.value.trim();
     updateAll();
   });
 
-  document
-    .getElementById("oh-drilldown-close")
+  container
+    .querySelector("#oh-drilldown-close")
     ?.addEventListener("click", () => {
-      const card = document.getElementById("oh-drilldown-card");
+      const card = container.querySelector("#oh-drilldown-card");
       if (card) card.style.display = "none";
       if (gruppeChart) {
         gruppeChart.destroy();

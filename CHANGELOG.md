@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.12.0 - 2026-08-06
+- CHG: DOM-Zugriffe auf den App-Container gescopt (F-25): alle Elemente der App werden über den App-Container (container.querySelector) angesprochen statt über document — KPI-Kacheln, Diagramm-Canvas, Drill-Down, Tabelle, Jahr-Auswahl, Ansicht-Radio, Suche und Schließen-Button
+
 ## 1.11.0 - 2026-08-06
 - FIX: Datenschutzangabe beschreibt den tatsaechlichen Stand nach dem Vendoring (Welle G)
 
