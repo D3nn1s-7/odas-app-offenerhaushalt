@@ -24,6 +24,7 @@
  *
  * Spaltenbezeichnungen werden flexibel per Alias-Matching erkannt.
  */
+let ohInstanzZaehler = 0;
 
 function isOdasProxyEnabled(configdata = {}) {
   return String(configdata.proxyAktiv || "").trim().toLowerCase() === "ja";
@@ -104,6 +105,7 @@ async function fetchOdasJson(targetUrl, configdata = {}) {
 }
 
 function app(configdata = {}, enclosingHtmlDivElement) {
+  const ohUid = "i" + ++ohInstanzZaehler;
   const apiUrl = configdata.apiurl || "";
   const appTitel = configdata.titel || "Offener Haushalt";
   const filterJahr = configdata.haushaltsjahr
@@ -194,7 +196,7 @@ function app(configdata = {}, enclosingHtmlDivElement) {
       setProgress(90, "Erstelle Visualisierungen\u2026", "");
       // Kurzer Timeout, damit der 90%-Balken sichtbar wird
       setTimeout(() => {
-        renderApp(records, enclosingHtmlDivElement, appTitel, filterJahr, configdata);
+        renderApp(records, enclosingHtmlDivElement, appTitel, filterJahr, configdata, ohUid);
       }, 80);
     })
     .catch((err) => {
@@ -395,7 +397,7 @@ function parseBetrag(val) {
 // RENDERING
 // ══════════════════════════════════════════════════════════════
 
-function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
+function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid) {
   const freshnessHtml = configdata.datenStand
     ? '<div class="text-end mb-2"><small class="text-muted">' +
       escapeHtml(String(configdata.datenStand)) +
@@ -505,7 +507,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
         </div>
       </div>
     </div>
-    ${renderWeitereInfos(configdata)}${renderMethodikbox(configdata)}`;
+    ${renderWeitereInfos(configdata)}${renderMethodikbox(configdata, uid)}`;
 
   // ── State ──────────────────────────────────────
   let currentJahr = aktivesJahr;
@@ -633,7 +635,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
         <div class="card border-success h-100">
           <div class="card-body text-center py-3">
             <div class="text-success fw-bold fs-5">${formatEuro(totalEinnahmen)}</div>
-            <div class="text-muted small">Gesamte Erträge/Einnahmen</div>\n              ${kpiContext(configdata.kpiKontext1, "1")}
+            <div class="text-muted small">Gesamte Erträge/Einnahmen</div>\n              ${kpiContext(configdata.kpiKontext1, "1", uid)}
           </div>
         </div>
       </div>
@@ -641,7 +643,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
         <div class="card border-danger h-100">
           <div class="card-body text-center py-3">
             <div class="text-danger fw-bold fs-5">${formatEuro(totalAusgaben)}</div>
-            <div class="text-muted small">Gesamter Aufwand/Ausgaben</div>\n              ${kpiContext(configdata.kpiKontext2, "2")}
+            <div class="text-muted small">Gesamter Aufwand/Ausgaben</div>\n              ${kpiContext(configdata.kpiKontext2, "2", uid)}
           </div>
         </div>
       </div>
@@ -651,7 +653,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
             <div class="text-${saldo >= 0 ? "primary" : "warning"} fw-bold fs-5">
               ${saldo >= 0 ? "+" : ""}${formatEuro(saldo)}
             </div>
-            <div class="text-muted small">Saldo</div>\n              ${kpiContext(configdata.kpiKontext3, "3")}
+            <div class="text-muted small">Saldo</div>\n              ${kpiContext(configdata.kpiKontext3, "3", uid)}
           </div>
         </div>
       </div>
@@ -659,7 +661,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata) {
         <div class="card border-secondary h-100">
           <div class="card-body text-center py-3">
             <div class="text-secondary fw-bold fs-5">${anzahlBereiche}</div>
-            <div class="text-muted small">Produktbereiche</div>\n              ${kpiContext(configdata.kpiKontext4, "4")}
+            <div class="text-muted small">Produktbereiche</div>\n              ${kpiContext(configdata.kpiKontext4, "4", uid)}
           </div>
         </div>
       </div>`;
@@ -925,10 +927,10 @@ function escapeHtml(str) {
 
 
   /* ── Schale 4: KPI Kontext ── */
-  function kpiContext(kontext, id) {
+  function kpiContext(kontext, id, uid) {
     var text = String(kontext || "").trim();
     if (!text) return "";
-    var targetId = "oh-kpi-kontext-" + id;
+    var targetId = "oh-kpi-kontext-" + id + "-" + uid;
     return (
       '<button class="oh-kpi-info-toggle collapsed" type="button" ' +
       'data-bs-toggle="collapse" data-bs-target="#' + targetId + '" ' +
@@ -943,7 +945,7 @@ function escapeHtml(str) {
   }
 
   /* ── Schale 4: Methodikbox ── */
-  function renderMethodikbox(cfg) {
+  function renderMethodikbox(cfg, uid) {
     var hinweis = ((cfg && cfg.datenquelleHinweis) || "").trim();
     var stand = ((cfg && cfg.datenStand) || "").trim();
     if (!hinweis && !stand) return "";
@@ -953,12 +955,12 @@ function escapeHtml(str) {
     return (
       '<section class="oh-methodik mt-3">' +
       '<button class="oh-methodik-toggle collapsed" type="button" ' +
-      'data-bs-toggle="collapse" data-bs-target="#oh-methodik-body" ' +
-      'aria-expanded="false" aria-controls="oh-methodik-body">' +
+      'data-bs-toggle="collapse" data-bs-target="#oh-methodik-body-' + uid + '" ' +
+      'aria-expanded="false" aria-controls="oh-methodik-body-' + uid + '">' +
       '<h2 class="h5 mb-0">Methodik &amp; Datenquelle</h2>' +
       '<span class="oh-methodik-chevron" aria-hidden="true">&#9662;</span>' +
       "</button>" +
-      '<div id="oh-methodik-body" class="collapse">' +
+      '<div id="oh-methodik-body-' + uid + '" class="collapse">' +
       '<div class="oh-methodik-content">' +
       standHtml +
       hinweis +
