@@ -145,27 +145,27 @@ function app(configdata = {}, enclosingHtmlDivElement) {
           Lade: <span class="fw-semibold text-body">${escapeHtml(_loadFilename)}</span>
         </div>
         <div class="d-flex justify-content-between align-items-center mb-1">
-          <span id="oh-load-msg" class="text-muted small">Verbinde mit Server\u2026</span>
-          <span id="oh-load-pct" class="text-muted small fw-semibold">0\u202f%</span>
+          <span id="oh-load-msg-${ohUid}" class="text-muted small">Verbinde mit Server\u2026</span>
+          <span id="oh-load-pct-${ohUid}" class="text-muted small fw-semibold">0\u202f%</span>
         </div>
         <div class="progress" style="height:10px; border-radius:6px;">
-          <div id="oh-load-bar"
+          <div id="oh-load-bar-${ohUid}"
                class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
                role="progressbar"
                style="width:0%; transition:width 0.35s ease;"
                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
-        <div id="oh-load-detail" class="text-center text-muted mt-2"
+        <div id="oh-load-detail-${ohUid}" class="text-center text-muted mt-2"
              style="font-size:0.78rem; min-height:1.4em;"></div>
       </div>
     </div>`;
 
   /** Aktualisiert Fortschrittsbalken, Beschriftung und Detailzeile */
   function setProgress(pct, msg, detail) {
-    const bar = enclosingHtmlDivElement.querySelector("#oh-load-bar");
-    const msgEl = enclosingHtmlDivElement.querySelector("#oh-load-msg");
-    const pctEl = enclosingHtmlDivElement.querySelector("#oh-load-pct");
-    const detEl = enclosingHtmlDivElement.querySelector("#oh-load-detail");
+    const bar = enclosingHtmlDivElement.querySelector("#oh-load-bar-" + ohUid);
+    const msgEl = enclosingHtmlDivElement.querySelector("#oh-load-msg-" + ohUid);
+    const pctEl = enclosingHtmlDivElement.querySelector("#oh-load-pct-" + ohUid);
+    const detEl = enclosingHtmlDivElement.querySelector("#oh-load-detail-" + ohUid);
     if (bar) {
       bar.style.width = pct + "%";
       bar.setAttribute("aria-valuenow", pct);
@@ -420,7 +420,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
     <div class="row g-2 mb-4 align-items-center">
       <div class="col-auto">
         <label class="form-label fw-semibold mb-0 me-2">Haushaltsjahr:</label>
-        <select id="oh-jahr-select" class="form-select form-select-sm d-inline-block"
+        <select id="oh-jahr-select-${uid}" class="form-select form-select-sm d-inline-block"
                 style="width:auto;">
           ${jahre
             .map(
@@ -433,54 +433,54 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
       <div class="col-auto">
         <label class="form-label fw-semibold mb-0 me-2">Ansicht:</label>
         <div class="btn-group btn-group-sm" role="group">
-          <input type="radio" class="btn-check" name="oh-ansicht"
-                 id="oh-ansicht-beide" value="beide" checked>
-          <label class="btn btn-outline-primary" for="oh-ansicht-beide">
+          <input type="radio" class="btn-check" name="oh-ansicht-${uid}"
+                 id="oh-ansicht-beide-${uid}" value="beide" checked>
+          <label class="btn btn-outline-primary" for="oh-ansicht-beide-${uid}">
             Einnahmen &amp; Ausgaben
           </label>
-          <input type="radio" class="btn-check" name="oh-ansicht"
-                 id="oh-ansicht-e" value="E">
-          <label class="btn btn-outline-success" for="oh-ansicht-e">
+          <input type="radio" class="btn-check" name="oh-ansicht-${uid}"
+                 id="oh-ansicht-e-${uid}" value="E">
+          <label class="btn btn-outline-success" for="oh-ansicht-e-${uid}">
             Nur Erträge/Einnahmen
           </label>
-          <input type="radio" class="btn-check" name="oh-ansicht"
-                 id="oh-ansicht-a" value="A">
-          <label class="btn btn-outline-danger" for="oh-ansicht-a">
+          <input type="radio" class="btn-check" name="oh-ansicht-${uid}"
+                 id="oh-ansicht-a-${uid}" value="A">
+          <label class="btn btn-outline-danger" for="oh-ansicht-a-${uid}">
             Nur Aufwand/Ausgaben
           </label>
         </div>
       </div>
       <div class="col-auto ms-auto">
-        <input type="text" id="oh-search" class="form-control form-control-sm"
+        <input type="text" id="oh-search-${uid}" class="form-control form-control-sm"
                placeholder="🔍 Produktbereich suchen…" style="width:220px;">
       </div>
     </div>
 
     ${freshnessHtml}
     <!-- KPI-Kacheln -->
-    <div class="row g-3 mb-4" id="oh-kpis"></div>
+    <div class="row g-3 mb-4" id="oh-kpis-${uid}"></div>
 
     <!-- Balkendiagramm Produktbereiche -->
     <div class="card mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
         <span class="fw-semibold">Ausgaben &amp; Einnahmen nach Produktbereich</span>
-        <small class="text-muted" id="oh-chart-subtitle"></small>
+        <small class="text-muted" id="oh-chart-subtitle-${uid}"></small>
       </div>
       <div class="card-body">
-        <canvas id="oh-chart-bereich" style="max-height:380px;"></canvas>
+        <canvas id="oh-chart-bereich-${uid}" style="max-height:380px;"></canvas>
       </div>
     </div>
 
     <!-- Drill-Down: Produktgruppen einer Auswahl -->
-    <div class="card mb-4" id="oh-drilldown-card" style="display:none;">
+    <div class="card mb-4" id="oh-drilldown-card-${uid}" style="display:none;">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <span class="fw-semibold" id="oh-drilldown-title">Produktgruppen</span>
-        <button class="btn btn-sm btn-outline-secondary" id="oh-drilldown-close">
+        <span class="fw-semibold" id="oh-drilldown-title-${uid}">Produktgruppen</span>
+        <button class="btn btn-sm btn-outline-secondary" id="oh-drilldown-close-${uid}">
           ✕ Schließen
         </button>
       </div>
       <div class="card-body">
-        <canvas id="oh-chart-gruppe" style="max-height:320px;"></canvas>
+        <canvas id="oh-chart-gruppe-${uid}" style="max-height:320px;"></canvas>
       </div>
     </div>
 
@@ -488,7 +488,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
     <div class="card mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
         <span class="fw-semibold">Detailtabelle</span>
-        <small class="text-muted" id="oh-table-count"></small>
+        <small class="text-muted" id="oh-table-count-${uid}"></small>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive" style="max-height:400px; overflow-y:auto;">
@@ -502,7 +502,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
                 <th class="text-end">Saldo (€)</th>
               </tr>
             </thead>
-            <tbody id="oh-table-body"></tbody>
+            <tbody id="oh-table-body-${uid}"></tbody>
           </table>
         </div>
       </div>
@@ -628,7 +628,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
     const saldo = totalEinnahmen - totalAusgaben;
     const anzahlBereiche = new Set(records.map((r) => r.bereichNr)).size;
 
-    const kpiEl = container.querySelector("#oh-kpis");
+    const kpiEl = container.querySelector("#oh-kpis-" + uid);
     if (!kpiEl) return;
     kpiEl.innerHTML = `
       <div class="col-6 col-md-3">
@@ -672,11 +672,11 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
     const daten = aggregiereNachBereich(records);
     const labels = daten.map((d) => kuerze(d.label, 28));
 
-    const subtitleEl = container.querySelector("#oh-chart-subtitle");
+    const subtitleEl = container.querySelector("#oh-chart-subtitle-" + uid);
     if (subtitleEl)
       subtitleEl.textContent = `${currentJahr} · ${daten.length} Bereiche`;
 
-    const ctx = container.querySelector("#oh-chart-bereich");
+    const ctx = container.querySelector("#oh-chart-bereich-" + uid);
     if (!ctx) return;
 
     if (bereichChart) bereichChart.destroy();
@@ -746,15 +746,15 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
     const daten = aggregiereNachGruppe(bereichRecords);
     const labels = daten.map((d) => kuerze(d.label, 32));
 
-    const card = container.querySelector("#oh-drilldown-card");
-    const titleEl = container.querySelector("#oh-drilldown-title");
+    const card = container.querySelector("#oh-drilldown-card-" + uid);
+    const titleEl = container.querySelector("#oh-drilldown-title-" + uid);
     if (card) card.style.display = "";
     if (titleEl) titleEl.textContent = `Produktgruppen: ${bereichData.label}`;
 
     // Zur Karte scrollen
     card.scrollIntoView({ behavior: "smooth", block: "start" });
 
-    const ctx = container.querySelector("#oh-chart-gruppe");
+    const ctx = container.querySelector("#oh-chart-gruppe-" + uid);
     if (!ctx) return;
     if (gruppeChart) gruppeChart.destroy();
 
@@ -806,8 +806,8 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
   // ── Detailtabelle rendern ─────────────────────
   function renderTabelle(records) {
     const daten = aggregiereNachGruppe(records);
-    const tbody = container.querySelector("#oh-table-body");
-    const countEl = container.querySelector("#oh-table-count");
+    const tbody = container.querySelector("#oh-table-body-" + uid);
+    const countEl = container.querySelector("#oh-table-count-" + uid);
     if (!tbody) return;
 
     if (countEl) countEl.textContent = `${daten.length} Produktgruppen`;
@@ -845,7 +845,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
     renderTabelle(records);
 
     // Drill-Down schließen bei Filterwechsel
-    const card = container.querySelector("#oh-drilldown-card");
+    const card = container.querySelector("#oh-drilldown-card-" + uid);
     if (card) card.style.display = "none";
     if (gruppeChart) {
       gruppeChart.destroy();
@@ -854,27 +854,27 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
   }
 
   // ── Event-Listener ────────────────────────────
-  container.querySelector("#oh-jahr-select")?.addEventListener("change", (e) => {
+  container.querySelector("#oh-jahr-select-" + uid)?.addEventListener("change", (e) => {
     currentJahr = e.target.value;
     updateAll();
   });
 
-  container.querySelectorAll("input[name='oh-ansicht']").forEach((radio) => {
+  container.querySelectorAll("input[name='oh-ansicht-" + uid + "']").forEach((radio) => {
     radio.addEventListener("change", (e) => {
       currentAnsicht = e.target.value;
       updateAll();
     });
   });
 
-  container.querySelector("#oh-search")?.addEventListener("input", (e) => {
+  container.querySelector("#oh-search-" + uid)?.addEventListener("input", (e) => {
     currentSearch = e.target.value.trim();
     updateAll();
   });
 
   container
-    .querySelector("#oh-drilldown-close")
+    .querySelector("#oh-drilldown-close-" + uid)
     ?.addEventListener("click", () => {
-      const card = container.querySelector("#oh-drilldown-card");
+      const card = container.querySelector("#oh-drilldown-card-" + uid);
       if (card) card.style.display = "none";
       if (gruppeChart) {
         gruppeChart.destroy();

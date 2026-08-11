@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.15.0 - 2026-08-11
+- FIX: Laufzeitzustand pro App-Instanz isoliert (F-42): alle `oh-`-IDs instanzeindeutig mit UID (`oh-jahr-select-<uid>`, `oh-ansicht-*-<uid>`, `oh-search-<uid>`, `oh-chart-bereich-<uid>`, `oh-chart-gruppe-<uid>`, KPIs, Drilldown, Tabelle, Ladeanzeige); Radiogruppen-`name="oh-ansicht-<uid>"` — mehrere Instanzen auf einer Seite koppeln ihre Ansichts-Gruppen nicht mehr; Selektoren bleiben container-gescopt (`root.querySelector`)
+
 ## 1.14.0 - 2026-08-11
 - FIX: XSS- und URL-Vertrag geschlossen (F-35)
 
