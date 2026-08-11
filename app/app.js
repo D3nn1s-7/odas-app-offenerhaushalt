@@ -425,7 +425,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
           ${jahre
             .map(
               (j) =>
-                `<option value="${j}"${j === aktivesJahr ? " selected" : ""}>${j}</option>`,
+                `<option value="${escapeHtml(j)}"${j === aktivesJahr ? " selected" : ""}>${escapeHtml(j)}</option>`,
             )
             .join("")}
         </select>
@@ -923,6 +923,11 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function safeHttpUrl(value) {
+  const s = String(value || "").trim();
+  return /^https?:\/\//i.test(s) ? s : "";
 }
 
 
