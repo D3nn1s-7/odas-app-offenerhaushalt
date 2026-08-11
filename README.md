@@ -89,14 +89,7 @@ App läuft auf http://localhost:8089 (Konfiguration wird lokal aus `odas-config/
 
 ### Live Server (ohne Docker)
 
-1. In `app/app-base.js` den Localhost-Block einkommentieren:
-   ```js
-   if (["127.0.0.1", "localhost"].includes(url.hostname)) {
-     configUrl = "../odas-config/config.json";
-   }
-   ```
-2. In `odas-config/config.json` die gewünschte `apiurl` eintragen.
-3. `app/index.html` mit VS Code Live Server öffnen: `http://127.0.0.1:5500/app/index.html`
+Die App erkennt Localhost (127.0.0.1/localhost) automatisch und lädt dann `odas-config/config.json`; kein Edit an `app/app-base.js` nötig. `app/index.html` mit VS Code Live Server öffnen: `http://127.0.0.1:5500/app/index.html` (in `odas-config/config.json` die gewünschte `apiurl` eintragen).
 
 ### Wichtige Dateien
 
