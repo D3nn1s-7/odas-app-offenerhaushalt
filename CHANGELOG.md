@@ -1,5 +1,9 @@
 # Changelog
 
+
+## 1.16.0 - 2026-08-12
+- FIX: `app/index.html` auf den Template-Stand (F-47): Datei byte-gleich aus `oda-generic` übernommen — gültiges HTML, deutsche ARIA-Labels, Footer im Body; Titel und Fußzeile bleiben Platzhalter und werden zur Laufzeit aus der Instanz-Config überschrieben
+
 ## 1.15.0 - 2026-08-11
 - FIX: Laufzeitzustand pro App-Instanz isoliert (F-42): alle `oh-`-IDs instanzeindeutig mit UID (`oh-jahr-select-<uid>`, `oh-ansicht-*-<uid>`, `oh-search-<uid>`, `oh-chart-bereich-<uid>`, `oh-chart-gruppe-<uid>`, KPIs, Drilldown, Tabelle, Ladeanzeige); Radiogruppen-`name="oh-ansicht-<uid>"` — mehrere Instanzen auf einer Seite koppeln ihre Ansichts-Gruppen nicht mehr; Selektoren bleiben container-gescopt (`root.querySelector`)
 
