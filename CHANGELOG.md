@@ -1,6 +1,9 @@
 # Changelog
 
 
+## 1.17.0 - 2026-08-13
+- FIX: Lifecycle-Ressourcen sauber abgeräumt (F-57): Bereichs- und Gruppen-Chart hängen nun an einem per-Instanz-`runtime`-Objekt; eine `onPageLeave`-Map-Registry zerstört beide Charts, räumt den gehaltenen Render-Timeout ab und schützt verspätete Fetch-Erfolge/-Fehler nach dem Seitenwechsel via `disposed`-Guard (kein DOM-Überschreiben, keine Fehlanzeige nach Leave)
+
 ## 1.16.0 - 2026-08-12
 - FIX: `app/index.html` auf den Template-Stand (F-47): Datei byte-gleich aus `oda-generic` übernommen — gültiges HTML, deutsche ARIA-Labels, Footer im Body; Titel und Fußzeile bleiben Platzhalter und werden zur Laufzeit aus der Instanz-Config überschrieben
 

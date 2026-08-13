@@ -26,6 +26,22 @@
  */
 let ohInstanzZaehler = 0;
 
+// Laufzeit-Cleanups pro App-Instanz, je DOM-Container registriert. onPageLeave
+// iteriert alle registrierten Cleanups (try/catch) und leert die Registry
+// anschliessend — die app/app-base.js ruft onPageLeave beim Seitenwechsel auf.
+const ohCleanups = new Map();
+
+function onPageLeave() {
+  ohCleanups.forEach((cleanup) => {
+    try {
+      cleanup();
+    } catch (_err) {
+      // Ein einzelner Cleanup darf den Seitenwechsel nicht blockieren.
+    }
+  });
+  ohCleanups.clear();
+}
+
 function isOdasProxyEnabled(configdata = {}) {
   return String(configdata.proxyAktiv || "").trim().toLowerCase() === "ja";
 }
@@ -112,6 +128,34 @@ function app(configdata = {}, enclosingHtmlDivElement) {
     ? String(configdata.haushaltsjahr)
     : null;
 
+  // Per-Instanz-Laufzeitzustand: wird synchron vor jeglicher Loader-DOM- und
+  // Async-Arbeit angelegt und je Container in ohCleanups registriert. Alle
+  // abzusichernden Ressourcen (Render-Timeout, beide Charts) haengen an diesem
+  // Objekt, damit der Cleanup beim Seitenwechsel genau diese Referenzen
+  // abraeumen kann — unabhaengig davon, in welcher Reihenfolge Promise-
+  // Fortsetzungen noch eintreffen.
+  const runtime = {
+    disposed: false,
+    renderTimeout: null,
+    bereichChart: null,
+    gruppeChart: null,
+  };
+  ohCleanups.set(enclosingHtmlDivElement, () => {
+    runtime.disposed = true;
+    if (runtime.renderTimeout !== null) {
+      clearTimeout(runtime.renderTimeout);
+      runtime.renderTimeout = null;
+    }
+    if (runtime.bereichChart) {
+      runtime.bereichChart.destroy();
+      runtime.bereichChart = null;
+    }
+    if (runtime.gruppeChart) {
+      runtime.gruppeChart.destroy();
+      runtime.gruppeChart = null;
+    }
+  });
+
   // ──────────────────────────────────────────────
   // 0. Ladeanimation mit Fortschrittsbalken
   // ──────────────────────────────────────────────
@@ -191,15 +235,30 @@ function app(configdata = {}, enclosingHtmlDivElement) {
 
   ladeDaten()
     .then((records) => {
+      if (runtime.disposed) return;
       if (!records || records.length === 0)
         throw new Error("Keine Datensätze gefunden.");
       setProgress(90, "Erstelle Visualisierungen\u2026", "");
-      // Kurzer Timeout, damit der 90%-Balken sichtbar wird
-      setTimeout(() => {
-        renderApp(records, enclosingHtmlDivElement, appTitel, filterJahr, configdata, ohUid);
+      // Kurzer Timeout, damit der 90%-Balken sichtbar wird. Der Timeout-Handle
+      // haengt am runtime, damit ihn onPageLeave beim Seitenwechsel abraeumen
+      // kann (kein Render nach dem Leave); der Callback versichert sich erneut
+      // ueber disposed, bevor er renderApp aufruft.
+      runtime.renderTimeout = setTimeout(() => {
+        runtime.renderTimeout = null;
+        if (runtime.disposed) return;
+        renderApp(
+          records,
+          enclosingHtmlDivElement,
+          appTitel,
+          filterJahr,
+          configdata,
+          ohUid,
+          runtime,
+        );
       }, 80);
     })
     .catch((err) => {
+      if (runtime.disposed) return;
       enclosingHtmlDivElement.innerHTML = `
         <div class="alert alert-danger mt-4">
           <strong>Fehler beim Laden der Daten:</strong> ${escapeHtml(err.message)}
@@ -215,11 +274,13 @@ function app(configdata = {}, enclosingHtmlDivElement) {
 
     if (isOdasProxyEnabled(configdata)) {
       const text = await fetchViaOdasProxy(apiUrl);
+      if (runtime.disposed) return null;
       setProgress(70, "Verarbeite Daten\u2026", "");
       return istCsv() ? parseCsv(text) : parseJson(JSON.parse(text));
     }
 
     const response = await fetch(apiUrl);
+    if (runtime.disposed) return null;
     if (!response.ok)
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     setProgress(25, "Verbunden \u2013 lade Daten\u2026", "");
@@ -234,8 +295,10 @@ function app(configdata = {}, enclosingHtmlDivElement) {
       const detail = contentLength
         ? `${formatBytes(Math.round(progress * contentLength))} von ${formatBytes(contentLength)}`
         : "";
-      setProgress(25 + Math.round(progress * 45), "Lade Daten\u2026", detail);
+      if (!runtime.disposed)
+        setProgress(25 + Math.round(progress * 45), "Lade Daten\u2026", detail);
     });
+    if (runtime.disposed) return null;
     setProgress(70, "Verarbeite Daten\u2026", "");
     return isCSV ? parseCsv(text) : parseJson(JSON.parse(text));
   }
@@ -397,7 +460,7 @@ function parseBetrag(val) {
 // RENDERING
 // ══════════════════════════════════════════════════════════════
 
-function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid) {
+function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid, runtime) {
   const freshnessHtml = configdata.datenStand
     ? '<div class="text-end mb-2"><small class="text-muted">' +
       escapeHtml(String(configdata.datenStand)) +
@@ -513,8 +576,6 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
   let currentJahr = aktivesJahr;
   let currentAnsicht = "beide";
   let currentSearch = "";
-  let bereichChart = null;
-  let gruppeChart = null;
 
   // ── Hilfsfunktionen ───────────────────────────
 
@@ -679,7 +740,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
     const ctx = container.querySelector("#oh-chart-bereich-" + uid);
     if (!ctx) return;
 
-    if (bereichChart) bereichChart.destroy();
+    if (runtime.bereichChart) runtime.bereichChart.destroy();
 
     const datasets = [];
     if (currentAnsicht !== "A") {
@@ -701,7 +762,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
       });
     }
 
-    bereichChart = new Chart(ctx, {
+    runtime.bereichChart = new Chart(ctx, {
       type: "bar",
       data: { labels, datasets },
       options: {
@@ -756,7 +817,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
 
     const ctx = container.querySelector("#oh-chart-gruppe-" + uid);
     if (!ctx) return;
-    if (gruppeChart) gruppeChart.destroy();
+    if (runtime.gruppeChart) runtime.gruppeChart.destroy();
 
     const datasets = [];
     if (currentAnsicht !== "A") {
@@ -778,7 +839,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
       });
     }
 
-    gruppeChart = new Chart(ctx, {
+    runtime.gruppeChart = new Chart(ctx, {
       type: "bar",
       data: { labels, datasets },
       options: {
@@ -847,9 +908,9 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
     // Drill-Down schließen bei Filterwechsel
     const card = container.querySelector("#oh-drilldown-card-" + uid);
     if (card) card.style.display = "none";
-    if (gruppeChart) {
-      gruppeChart.destroy();
-      gruppeChart = null;
+    if (runtime.gruppeChart) {
+      runtime.gruppeChart.destroy();
+      runtime.gruppeChart = null;
     }
   }
 
@@ -876,9 +937,9 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid)
     ?.addEventListener("click", () => {
       const card = container.querySelector("#oh-drilldown-card-" + uid);
       if (card) card.style.display = "none";
-      if (gruppeChart) {
-        gruppeChart.destroy();
-        gruppeChart = null;
+      if (runtime.gruppeChart) {
+        runtime.gruppeChart.destroy();
+        runtime.gruppeChart = null;
       }
     });
 
