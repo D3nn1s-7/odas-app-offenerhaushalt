@@ -1,6 +1,9 @@
 # Changelog
 
 
+## 1.18.0 - 2026-08-17
+- **CHG:** `instanz-config`-`category`-Vokabular auf Deutsch umgestellt (`allgemein`, `beschreibung`, `datenherkunft`, `kontakt-rechtliches`, `sonstiges`); die entfallenen Kategorien `metrics` und `advanced` wurden auf `beschreibung` bzw. `sonstiges` verteilt
+
 ## 1.17.0 - 2026-08-13
 - FIX: Lifecycle-Ressourcen sauber abgeräumt (F-57): Bereichs- und Gruppen-Chart hängen nun an einem per-Instanz-`runtime`-Objekt; eine `onPageLeave`-Map-Registry zerstört beide Charts, räumt den gehaltenen Render-Timeout ab und schützt verspätete Fetch-Erfolge/-Fehler nach dem Seitenwechsel via `disposed`-Guard (kein DOM-Überschreiben, keine Fehlanzeige nach Leave)
 
