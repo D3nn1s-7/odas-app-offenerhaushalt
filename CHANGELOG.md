@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 1.20.0 - 2026-08-20
+- FIX: Eigener CSV-Parser brach nachweislich bei eingebetteten Zeilenumbrüchen in Anführungszeichen und doppelten Escape-Quotes; durch vendorte PapaParse ersetzt (F-72)
+- FIX: Strukturell ungültige CSV-Zeilen werden jetzt gezählt und als Hinweis angezeigt statt kommentarlos verworfen (F-73)
+
 ## 1.19.0 - 2026-08-17
 - `fetchOdasJson()` wirft jetzt bei nicht-JSON-Antworten (CSV, HTML, leerer Body) eine sprechende Konfigurationsfehlermeldung statt der rohen `JSON.parse`-Parserfehlermeldung (F-66)
 

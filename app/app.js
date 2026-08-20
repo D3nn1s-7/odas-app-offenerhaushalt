@@ -138,6 +138,34 @@ function describeNonJsonPayload(rawContent) {
   return "unlesbaren Inhalt";
 }
 
+// PapaParse (CSV-Parsing) dynamisch aus app/vendor laden; Promise-basiert.
+// F-72: ersetzt den vormals selbstgeschriebenen CSV-Parser, der bei
+// eingebetteten Zeilenumbrüchen in Anführungszeichen und doppelten
+// Escape-Quotes ("") nachweislich Datensätze verstümmelte.
+function ensurePapaparse() {
+  return new Promise((resolve, reject) => {
+    if (window.Papa) {
+      resolve();
+      return;
+    }
+    const vorhanden = document.getElementById("papaparse-script");
+    if (vorhanden) {
+      vorhanden.addEventListener("load", () => resolve());
+      vorhanden.addEventListener("error", () =>
+        reject(new Error("PapaParse konnte nicht geladen werden.")),
+      );
+      return;
+    }
+    const script = document.createElement("script");
+    script.id = "papaparse-script";
+    script.src = "vendor/papaparse/papaparse.min.js";
+    script.onload = () => resolve();
+    script.onerror = () =>
+      reject(new Error("PapaParse konnte nicht geladen werden."));
+    document.head.appendChild(script);
+  });
+}
+
 function app(configdata = {}, enclosingHtmlDivElement) {
   const ohUid = "i" + ++ohInstanzZaehler;
   const apiUrl = configdata.apiurl || "";
@@ -239,9 +267,8 @@ function app(configdata = {}, enclosingHtmlDivElement) {
 
   if (!apiUrl) {
     enclosingHtmlDivElement.innerHTML = `
-      <div class="alert alert-warning mt-4">
-        <strong>Konfigurationsfehler:</strong> Keine API-URL angegeben
-        (<code>apiurl</code> fehlt in der config.json).
+      <div class="alert alert-info mt-4" role="alert">
+        Es ist keine Datenquelle konfiguriert.
       </div>`;
     return null;
   }
@@ -252,10 +279,17 @@ function app(configdata = {}, enclosingHtmlDivElement) {
   setProgress(10, "Verbinde mit Server\u2026", "");
 
   ladeDaten()
-    .then((records) => {
+    .then((ladeErgebnis) => {
       if (runtime.disposed) return;
-      if (!records || records.length === 0)
-        throw new Error("Keine Datensätze gefunden.");
+      const records = ladeErgebnis ? ladeErgebnis.records : null;
+      const verworfen = ladeErgebnis ? ladeErgebnis.verworfen : 0;
+      if (!records || records.length === 0) {
+        enclosingHtmlDivElement.innerHTML = `
+          <div class="alert alert-info mt-4" role="alert">
+            Keine Datensätze in der Datenquelle gefunden.
+          </div>`;
+        return;
+      }
       setProgress(90, "Erstelle Visualisierungen\u2026", "");
       // Kurzer Timeout, damit der 90%-Balken sichtbar wird. Der Timeout-Handle
       // haengt am runtime, damit ihn onPageLeave beim Seitenwechsel abraeumen
@@ -272,6 +306,7 @@ function app(configdata = {}, enclosingHtmlDivElement) {
           configdata,
           ohUid,
           runtime,
+          verworfen,
         );
       }, 80);
     })
@@ -294,7 +329,12 @@ function app(configdata = {}, enclosingHtmlDivElement) {
       const text = await fetchViaOdasProxy(apiUrl);
       if (runtime.disposed) return null;
       setProgress(70, "Verarbeite Daten\u2026", "");
-      return istCsv() ? parseCsv(text) : parseJson(JSON.parse(text));
+      if (istCsv()) {
+        await ensurePapaparse();
+        if (runtime.disposed) return null;
+        return parseCsv(text);
+      }
+      return { records: parseJson(JSON.parse(text)), verworfen: 0 };
     }
 
     const response = await fetch(apiUrl);
@@ -318,7 +358,12 @@ function app(configdata = {}, enclosingHtmlDivElement) {
     });
     if (runtime.disposed) return null;
     setProgress(70, "Verarbeite Daten\u2026", "");
-    return isCSV ? parseCsv(text) : parseJson(JSON.parse(text));
+    if (isCSV) {
+      await ensurePapaparse();
+      if (runtime.disposed) return null;
+      return parseCsv(text);
+    }
+    return { records: parseJson(JSON.parse(text)), verworfen: 0 };
   }
 
   return null;
@@ -355,49 +400,42 @@ function parseJson(json) {
   return normalizeRecords(records);
 }
 
+// F-72: CSV wird ueber die vendorte PapaParse geparst statt ueber einen
+// eigenen, naiven "text.split('\n')"-Parser. Der frühere Eigenbau zerlegte
+// Datensätze mit eingebetteten Zeilenumbrüchen in Anführungszeichen bereits
+// vor der Quote-Erkennung falsch und verstand keine doppelten
+// Escape-Quotes (""); PapaParse (RFC 4180) behandelt beide Fälle korrekt.
+//
+// F-73: strukturell unvollständige Zeilen (zu wenige Felder) werden nicht
+// mehr kommentarlos verworfen, sondern gezählt und als "verworfen"
+// zurückgegeben, damit der Aufrufer sie dem Nutzer anzeigen kann.
 function parseCsv(text) {
-  const lines = text
-    .replace(/\r/g, "")
-    .split("\n")
-    .filter((l) => l.trim());
-  if (lines.length < 2) throw new Error("CSV enthält zu wenig Zeilen.");
+  const result = Papa.parse(text, {
+    header: true,
+    skipEmptyLines: "greedy",
+    transformHeader: (h) => h.trim(),
+    transform: (v) => (typeof v === "string" ? v.trim() : v),
+  });
 
-  const sep = lines[0].includes(";") ? ";" : ",";
-  const headers = lines[0]
-    .split(sep)
-    .map((h) => h.trim().replace(/^"|"$/g, ""));
-  const records = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const vals = splitCsvLine(lines[i], sep);
-    if (vals.length < 2) continue;
-    const obj = {};
-    headers.forEach((h, idx) => {
-      obj[h] = (vals[idx] || "").trim().replace(/^"|"$/g, "");
-    });
-    records.push(obj);
+  if (!result.meta || !result.meta.fields || !result.meta.fields.length) {
+    throw new Error("CSV enthält zu wenig Zeilen.");
   }
 
-  return normalizeRecords(records);
-}
+  // PapaParse meldet Zeilen mit zu wenigen Feldern (gegenüber der
+  // Kopfzeile) als "TooFewFields"-Fehler statt sie stillschweigend zu
+  // uebernehmen oder zu verwerfen.
+  const unvollstaendigeZeilen = new Set(
+    (result.errors || [])
+      .filter((err) => err.code === "TooFewFields")
+      .map((err) => err.row),
+  );
 
-function splitCsvLine(line, sep) {
-  const result = [];
-  let cur = "";
-  let inQuote = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') {
-      inQuote = !inQuote;
-    } else if (c === sep && !inQuote) {
-      result.push(cur);
-      cur = "";
-    } else {
-      cur += c;
-    }
-  }
-  result.push(cur);
-  return result;
+  const records = result.data.filter((_, idx) => !unvollstaendigeZeilen.has(idx));
+
+  return {
+    records: normalizeRecords(records),
+    verworfen: unvollstaendigeZeilen.size,
+  };
 }
 
 function normalizeRecords(records) {
@@ -478,12 +516,22 @@ function parseBetrag(val) {
 // RENDERING
 // ══════════════════════════════════════════════════════════════
 
-function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid, runtime) {
+function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid, runtime, verworfen = 0) {
   const freshnessHtml = configdata.datenStand
     ? '<div class="text-end mb-2"><small class="text-muted">' +
       escapeHtml(String(configdata.datenStand)) +
       "</small></div>"
     : "";
+  // F-73: strukturell unvollständige CSV-Zeilen (zu wenige Felder) werden
+  // nicht mehr kommentarlos verworfen, sondern hier sichtbar gemacht.
+  const verworfenHtml =
+    verworfen > 0
+      ? '<div class="alert alert-warning py-2 px-3 mb-3" role="alert">' +
+        escapeHtml(
+          `${verworfen} von ${allRecords.length + verworfen} Zeilen wurden wegen unvollständiger Daten übersprungen.`,
+        ) +
+        "</div>"
+      : "";
   const jahre = [
     ...new Set(allRecords.map((r) => r.jahr).filter(Boolean)),
   ].sort();
@@ -538,6 +586,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
     </div>
 
     ${freshnessHtml}
+    ${verworfenHtml}
     <!-- KPI-Kacheln -->
     <div class="row g-3 mb-4" id="oh-kpis-${uid}"></div>
 
@@ -664,10 +713,11 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
   function aggregiereNachGruppe(records) {
     const map = new Map();
     records.forEach((r) => {
-      const key = r.gruppeNr;
+      const key = r.gruppeNr || r.gruppeName || "Unbekannt";
       const name = r.gruppeName || r.gruppeNr || "Unbekannt";
+      const bereich = r.bereichName || r.bereichNr || "";
       if (!map.has(key))
-        map.set(key, { label: name, einnahmen: 0, ausgaben: 0 });
+        map.set(key, { bereich: bereich, label: name, einnahmen: 0, ausgaben: 0 });
       const entry = map.get(key);
       const isAusgabe = [
         "A",
@@ -904,8 +954,8 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
         const saldoClass = saldo >= 0 ? "text-success" : "text-danger";
         return `
         <tr>
-          <td class="text-muted small">${escapeHtml(d.label)}</td>
-          <td></td>
+          <td class="text-muted small">${escapeHtml(d.bereich || "")}</td>
+          <td>${escapeHtml(d.label)}</td>
           <td class="text-end text-success">${formatEuro(d.einnahmen)}</td>
           <td class="text-end text-danger">${formatEuro(d.ausgaben)}</td>
           <td class="text-end fw-semibold ${saldoClass}">
