@@ -1,6 +1,9 @@
 # Changelog
 
 
+## 1.21.0 - 2026-08-20
+- Markdown-Metadaten: Paketbeschreibungen auf echtes Markdown umgestellt, exakte Identität Top-Level/Instanz hergestellt, lokale HTML-Fixture semantisch gespiegelt.
+
 ## 1.20.0 - 2026-08-20
 - FIX: Eigener CSV-Parser brach nachweislich bei eingebetteten Zeilenumbrüchen in Anführungszeichen und doppelten Escape-Quotes; durch vendorte PapaParse ersetzt (F-72)
 - FIX: Strukturell ungültige CSV-Zeilen werden jetzt gezählt und als Hinweis angezeigt statt kommentarlos verworfen (F-73)
