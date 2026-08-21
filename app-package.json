@@ -3,7 +3,7 @@
   "app-entwickler-name": "ondics-gmbh",
   "name-in-url": "offener-haushalt",
   "name": "Offener Haushalt",
-  "version": "1.21.0",
+  "version": "1.22.0",
   "odas-app-icon": "assets/odas-app-icon.svg",
   "app-icon": "assets/odas-app-icon.svg",
   "kurzbeschreibung": "Interaktive Visualisierung des kommunalen Haushalts – Einnahmen und Ausgaben nach Produktbereichen.",
@@ -15,7 +15,7 @@
     "",
     "## Methodik",
     "",
-    "Die App lädt die in `apiurl` konfigurierte Quelle im Browser – direkt oder optional über den ODAS-Proxy (`proxyAktiv`) – und erkennt das Format automatisch: Liefert die Quelle JSON, werden die gelieferten Strukturen normalisiert; liefert sie CSV, wird sie über PapaParse mit automatischer Delimiter-Erkennung geparst.",
+    "Die App lädt die in `apiurls.haushalt` konfigurierte Quelle im Browser – direkt oder optional über den ODAS-Proxy (`proxyAktiv`) – und erkennt das Format automatisch: Liefert die Quelle JSON, werden die gelieferten Strukturen normalisiert; liefert sie CSV, wird sie über PapaParse mit automatischer Delimiter-Erkennung geparst.",
     "",
     "Unterstützte JSON-Formen sind CKAN (`result.records`), OpenDataSoft v1 (`records` mit `fields`), OpenDataSoft v2 (`results`) sowie direktes Array oder Objekte mit `data` bzw. `items`. Feldnamen werden per Alias-Suche normalisiert (`produktbereich`/`bereich`/`hauptgruppe`, `produktgruppe`/`gruppe`/`untergruppe`, `haushaltsjahr`/`jahr`/`year`/`geschaeftsjahr`, `ertragaufwand`/`richtung`/`typ`/`art`/`einnahmenausgaben`, `betrag`/`wert`/`summe`/`plan`/`ansatz`); Beträge werden als Zahlen oder Strings mit deutscher oder Dezimal-Schreibweise interpretiert (z. B. `1.234,56` → 1234.56).",
     "",
@@ -25,7 +25,7 @@
     "",
     "## Datenquelle",
     "",
-    "Die Haushaltsdaten werden über die in `apiurl` konfigurierte Ressource des Open-Data-Portals Rhein-Kreis Neuss bereitgestellt; die Katalogseite wird über `urlDaten` verlinkt.",
+    "Die Haushaltsdaten werden über die in `apiurls.haushalt` konfigurierte Ressource des Open-Data-Portals Rhein-Kreis Neuss bereitgestellt; die Katalogseite wird über `urlDaten` verlinkt.",
     "",
     "- **Open Data Portal:** [Open Data Rhein-Kreis Neuss](https://opendata.rhein-kreis-neuss.de/)",
     "- **Datensatz:** [Offener Haushalt](https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/)",
@@ -128,7 +128,7 @@
         "",
         "## Methodik",
         "",
-        "Die App lädt die in `apiurl` konfigurierte Quelle im Browser – direkt oder optional über den ODAS-Proxy (`proxyAktiv`) – und erkennt das Format automatisch: Liefert die Quelle JSON, werden die gelieferten Strukturen normalisiert; liefert sie CSV, wird sie über PapaParse mit automatischer Delimiter-Erkennung geparst.",
+        "Die App lädt die in `apiurls.haushalt` konfigurierte Quelle im Browser – direkt oder optional über den ODAS-Proxy (`proxyAktiv`) – und erkennt das Format automatisch: Liefert die Quelle JSON, werden die gelieferten Strukturen normalisiert; liefert sie CSV, wird sie über PapaParse mit automatischer Delimiter-Erkennung geparst.",
         "",
         "Unterstützte JSON-Formen sind CKAN (`result.records`), OpenDataSoft v1 (`records` mit `fields`), OpenDataSoft v2 (`results`) sowie direktes Array oder Objekte mit `data` bzw. `items`. Feldnamen werden per Alias-Suche normalisiert (`produktbereich`/`bereich`/`hauptgruppe`, `produktgruppe`/`gruppe`/`untergruppe`, `haushaltsjahr`/`jahr`/`year`/`geschaeftsjahr`, `ertragaufwand`/`richtung`/`typ`/`art`/`einnahmenausgaben`, `betrag`/`wert`/`summe`/`plan`/`ansatz`); Beträge werden als Zahlen oder Strings mit deutscher oder Dezimal-Schreibweise interpretiert (z. B. `1.234,56` → 1234.56).",
         "",
@@ -138,7 +138,7 @@
         "",
         "## Datenquelle",
         "",
-        "Die Haushaltsdaten werden über die in `apiurl` konfigurierte Ressource des Open-Data-Portals Rhein-Kreis Neuss bereitgestellt; die Katalogseite wird über `urlDaten` verlinkt.",
+        "Die Haushaltsdaten werden über die in `apiurls.haushalt` konfigurierte Ressource des Open-Data-Portals Rhein-Kreis Neuss bereitgestellt; die Katalogseite wird über `urlDaten` verlinkt.",
         "",
         "- **Open Data Portal:** [Open Data Rhein-Kreis Neuss](https://opendata.rhein-kreis-neuss.de/)",
         "- **Datensatz:** [Offener Haushalt](https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/)",
@@ -240,17 +240,24 @@
       },
       "erforderlich": "ja"
     },
-    "apiurl": {
-      "label": "URL zu den Haushaltsdaten",
+    "apiurls": {
+      "label": "URLs zu Datenressourcen",
       "category": "datenherkunft",
-      "hilfe": "Direkte URL zur Datenressource (JSON oder CSV). Unterstützte Formate: CKAN Datastore, OpenDataSoft API v1/v2, direktes JSON-Array, CSV.",
+      "hilfe": "Direkter Download-, Datei- oder API-Endpunkt der tatsächlich verwendeten Datenquelle(n). Mehrere Einträge möglich.",
+      "typ": "array",
       "format": {
         "typ": "url",
-        "laenge": 255
+        "laenge": 500
       },
-      "default": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
-      "beispiel": "",
-      "erforderlich": "ja"
+      "urls": [
+        {
+          "name": "haushalt",
+          "label": "URL zu den Haushaltsdaten",
+          "default": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
+          "beispiel": "",
+          "erforderlich": "ja"
+        }
+      ]
     },
     "weiterfuehrendeLinks": {
       "label": "Weiterführende Links",

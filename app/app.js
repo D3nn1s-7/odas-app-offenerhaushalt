@@ -12,7 +12,9 @@
  *
  * ConfigData JSON enthält:
  * {
- *   "apiurl": "https://...",          // URL zur JSON oder CSV Ressource
+ *   "apiurls": [                      // URL(s) zur JSON- oder CSV-Ressource
+ *     { "name": "haushalt", "label": "...", "url": "https://..." }
+ *   ],
  *   "titel": "Offener Haushalt",      // optional
  *   "haushaltsjahr": "2024"           // optional – Filter auf ein Jahr
  * }
@@ -116,6 +118,17 @@ async function fetchOdasResource(targetUrl, configdata = {}) {
   }
 }
 
+/**
+ * Löst eine benannte Datenressource aus configdata.apiurls auf.
+ * Neue apiurls-Form (typ: "array"); das frühere skalare apiurl wird nicht mehr gelesen.
+ * @returns {string} getrimmte URL, oder "" für den Zustand "keine Quelle konfiguriert"
+ */
+function getOdasApiUrl(configdata, name) {
+  const liste = Array.isArray(configdata && configdata.apiurls) ? configdata.apiurls : [];
+  const treffer = liste.find((eintrag) => eintrag && eintrag.name === name);
+  return String((treffer && treffer.url) || "").trim();
+}
+
 async function fetchOdasJson(targetUrl, configdata = {}) {
   const rawContent = await fetchOdasResource(targetUrl, configdata);
   try {
@@ -168,7 +181,7 @@ function ensurePapaparse() {
 
 function app(configdata = {}, enclosingHtmlDivElement) {
   const ohUid = "i" + ++ohInstanzZaehler;
-  const apiUrl = configdata.apiurl || "";
+  const apiUrl = getOdasApiUrl(configdata, "haushalt");
   const appTitel = configdata.titel || "Offener Haushalt";
   const filterJahr = configdata.haushaltsjahr
     ? String(configdata.haushaltsjahr)

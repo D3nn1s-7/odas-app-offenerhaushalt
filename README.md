@@ -89,7 +89,7 @@ App läuft auf http://localhost:8089 (Konfiguration wird lokal aus `odas-config/
 
 ### Live Server (ohne Docker)
 
-Die App erkennt Localhost (127.0.0.1/localhost) automatisch und lädt dann `odas-config/config.json`; kein Edit an `app/app-base.js` nötig. `app/index.html` mit VS Code Live Server öffnen: `http://127.0.0.1:5500/app/index.html` (in `odas-config/config.json` die gewünschte `apiurl` eintragen).
+Die App erkennt Localhost (127.0.0.1/localhost) automatisch und lädt dann `odas-config/config.json`; kein Edit an `app/app-base.js` nötig. `app/index.html` mit VS Code Live Server öffnen: `http://127.0.0.1:5500/app/index.html` (in `odas-config/config.json` die gewünschte `apiurls.haushalt`-URL eintragen).
 
 ### Wichtige Dateien
 
@@ -111,7 +111,7 @@ Die App erkennt Localhost (127.0.0.1/localhost) automatisch und lädt dann `odas
 
 | Parameter       | Beschreibung                                                         | Pflicht |
 | --------------- | -------------------------------------------------------------------- | ------- |
-| `apiurl`        | Direkte URL zur Datenressource (JSON oder CSV)                       | ja      |
+| `apiurls`       | URLs zu Datenressourcen. Eintrag `haushalt`: direkte URL zur Datenressource (JSON oder CSV) | ja (Eintrag `haushalt`) |
 | `urlDaten`      | URL zur Katalog-Seite des Datensatzes im ODP                         | ja      |
 | `titel`         | Anzeigetitel der App                                                 | ja      |
 | `seitentitel`   | Browser-Tab-Titel                                                    | ja      |

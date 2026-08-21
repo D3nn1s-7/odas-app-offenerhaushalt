@@ -9,12 +9,12 @@
     "<p>Die Offener-Haushalt-App visualisiert kommunale Haushaltsdaten verständlich und interaktiv.</p>",
     "<p>Einnahmen und Ausgaben werden nach Produktbereichen und Produktgruppen dargestellt, sodass finanzielle Schwerpunkte besser nachvollziehbar werden. Für wen ist diese App? Sie richtet sich an Bürger:innen, Kommunalpolitik, Verwaltung, Medien und Initiativen, die Haushaltsdaten verständlich betrachten möchten – besondere Datenkenntnisse sind nicht erforderlich.</p>",
     "<h2>Methodik</h2>",
-    "<p>Die App lädt die in <code>apiurl</code> konfigurierte Quelle im Browser – direkt oder optional über den ODAS-Proxy (<code>proxyAktiv</code>) – und erkennt das Format automatisch: Liefert die Quelle JSON, werden die gelieferten Strukturen normalisiert; liefert sie CSV, wird sie über PapaParse mit automatischer Delimiter-Erkennung geparst.</p>",
+    "<p>Die App lädt die in <code>apiurls.haushalt</code> konfigurierte Quelle im Browser – direkt oder optional über den ODAS-Proxy (<code>proxyAktiv</code>) – und erkennt das Format automatisch: Liefert die Quelle JSON, werden die gelieferten Strukturen normalisiert; liefert sie CSV, wird sie über PapaParse mit automatischer Delimiter-Erkennung geparst.</p>",
     "<p>Unterstützte JSON-Formen sind CKAN (<code>result.records</code>), OpenDataSoft v1 (<code>records</code> mit <code>fields</code>), OpenDataSoft v2 (<code>results</code>) sowie direktes Array oder Objekte mit <code>data</code> bzw. <code>items</code>. Feldnamen werden per Alias-Suche normalisiert (<code>produktbereich</code>/<code>bereich</code>/<code>hauptgruppe</code>, <code>produktgruppe</code>/<code>gruppe</code>/<code>untergruppe</code>, <code>haushaltsjahr</code>/<code>jahr</code>/<code>year</code>/<code>geschaeftsjahr</code>, <code>ertragaufwand</code>/<code>richtung</code>/<code>typ</code>/<code>art</code>/<code>einnahmenausgaben</code>, <code>betrag</code>/<code>wert</code>/<code>summe</code>/<code>plan</code>/<code>ansatz</code>); Beträge werden als Zahlen oder Strings mit deutscher oder Dezimal-Schreibweise interpretiert (z. B. <code>1.234,56</code> → 1234.56).</p>",
     "<p>Die Oberfläche erlaubt die Filterung nach Haushaltsjahr (Schalter <code>haushaltsjahr</code> oder Auswahl in der App), nach Ansicht (Erträge/Einnahmen, Aufwand/Ausgaben oder beide) und per Freitextsuche über Produktbereich und Produktgruppe. Aus den gefilterten Datensätzen gruppiert die App zweistufig nach Produktbereich → Produktgruppe, berechnet Summen für Erträge und Aufwand, daraus den Saldo (Erträge minus Aufwand) und die Anzahl der Produktbereiche, und zeigt sie als KPI-Kacheln, als Balkendiagramm nach Produktbereich mit Drill-down auf die Gruppen eines Bereichs sowie als gruppierte Detailtabelle.</p>",
     "<p>Welche Produktbereiche, Gruppen, Jahre, Typen und Betragsfelder tatsächlich vorhanden sind und wie aktuell die Daten sind, hängt vom jeweiligen Datensatz ab; angezeigt werden die in der Quelle vorhandenen Haushaltspositionen.</p>",
     "<h2>Datenquelle</h2>",
-    "<p>Die Haushaltsdaten werden über die in <code>apiurl</code> konfigurierte Ressource des Open-Data-Portals Rhein-Kreis Neuss bereitgestellt; die Katalogseite wird über <code>urlDaten</code> verlinkt.</p>",
+    "<p>Die Haushaltsdaten werden über die in <code>apiurls.haushalt</code> konfigurierte Ressource des Open-Data-Portals Rhein-Kreis Neuss bereitgestellt; die Katalogseite wird über <code>urlDaten</code> verlinkt.</p>",
     "<ul>",
     "<li><strong>Open Data Portal:</strong> <a href=\"https://opendata.rhein-kreis-neuss.de/\" target=\"_blank\">Open Data Rhein-Kreis Neuss</a></li>",
     "<li><strong>Datensatz:</strong> <a href=\"https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/\" target=\"_blank\">Offener Haushalt</a></li>",
@@ -44,7 +44,13 @@
     "App-Entwickler: Ondics GmbH"
   ],
   "haushaltsjahr": "",
-  "apiurl": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
+  "apiurls": [
+    {
+      "name": "haushalt",
+      "label": "URL zu den Haushaltsdaten",
+      "url": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin"
+    }
+  ],
   "weiterfuehrendeLinks": "<ul><li><a href=\"https://opendata.rhein-kreis-neuss.de/\" target=\"_blank\" rel=\"noopener\">Open Data Rhein-Kreis Neuss</a></li><li><a href=\"https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/\" target=\"_blank\" rel=\"noopener\">Datensatz Offener Haushalt</a></li><li><a href=\"https://open-data-app-store.de\" target=\"_blank\" rel=\"noopener\">Open Data App Store</a></li></ul>",
   "datenStand": "Stand: abhängig von Datenquelle",
   "sprache": "de",
