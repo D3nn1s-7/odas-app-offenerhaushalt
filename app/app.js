@@ -78,9 +78,7 @@ function getOdasAppBasePath(pathname) {
 
 function getOdasProxyEndpoint(targetUrl, pathname) {
   const appPath = getOdasAppBasePath(pathname);
-  return `${appPath}/odp-data?path=${encodeURIComponent(
-    extractPathFromUrl(targetUrl),
-  )}`;
+  return `${appPath}/odp-data?path=${encodeURIComponent(targetUrl)}`;
 }
 
 async function fetchViaOdasProxy(targetUrl) {
