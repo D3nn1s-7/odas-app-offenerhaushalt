@@ -1,127 +1,14 @@
 {
-  "app-entwickler-id": "12343",
-  "app-entwickler-name": "ondics-gmbh",
-  "name-in-url": "offener-haushalt",
-  "name": "Offener Haushalt",
-  "app-version": "1.24.0",
-  "app-package-version": "2",
-  "odas-app-icon": "assets/odas-app-icon.svg",
-  "app-icon": "assets/odas-app-icon.svg",
-  "kurzbeschreibung": "Interaktive Visualisierung des kommunalen Haushalts – Einnahmen und Ausgaben nach Produktbereichen.",
-  "beschreibung": [
-    "_multiline_",
-    "Die Offener-Haushalt-App visualisiert kommunale Haushaltsdaten verständlich und interaktiv.",
-    "",
-    "Einnahmen und Ausgaben werden nach Produktbereichen und Produktgruppen dargestellt, sodass finanzielle Schwerpunkte besser nachvollziehbar werden. Für wen ist diese App? Sie richtet sich an Bürger:innen, Kommunalpolitik, Verwaltung, Medien und Initiativen, die Haushaltsdaten verständlich betrachten möchten – besondere Datenkenntnisse sind nicht erforderlich.",
-    "",
-    "## Methodik",
-    "",
-    "Die App lädt die in `apiurls.haushalt` konfigurierte Quelle im Browser – direkt oder optional über den ODAS-Proxy (`proxyAktiv`) – und erkennt das Format automatisch: Liefert die Quelle JSON, werden die gelieferten Strukturen normalisiert; liefert sie CSV, wird sie über PapaParse mit automatischer Delimiter-Erkennung geparst.",
-    "",
-    "Unterstützte JSON-Formen sind CKAN (`result.records`), OpenDataSoft v1 (`records` mit `fields`), OpenDataSoft v2 (`results`) sowie direktes Array oder Objekte mit `data` bzw. `items`. Feldnamen werden per Alias-Suche normalisiert (`produktbereich`/`bereich`/`hauptgruppe`, `produktgruppe`/`gruppe`/`untergruppe`, `haushaltsjahr`/`jahr`/`year`/`geschaeftsjahr`, `ertragaufwand`/`richtung`/`typ`/`art`/`einnahmenausgaben`, `betrag`/`wert`/`summe`/`plan`/`ansatz`); Beträge werden als Zahlen oder Strings mit deutscher oder Dezimal-Schreibweise interpretiert (z. B. `1.234,56` → 1234.56).",
-    "",
-    "Die Oberfläche erlaubt die Filterung nach Haushaltsjahr (Schalter `haushaltsjahr` oder Auswahl in der App), nach Ansicht (Erträge/Einnahmen, Aufwand/Ausgaben oder beide) und per Freitextsuche über Produktbereich und Produktgruppe. Aus den gefilterten Datensätzen gruppiert die App zweistufig nach Produktbereich → Produktgruppe, berechnet Summen für Erträge und Aufwand, daraus den Saldo (Erträge minus Aufwand) und die Anzahl der Produktbereiche, und zeigt sie als KPI-Kacheln, als Balkendiagramm nach Produktbereich mit Drill-down auf die Gruppen eines Bereichs sowie als gruppierte Detailtabelle.",
-    "",
-    "Welche Produktbereiche, Gruppen, Jahre, Typen und Betragsfelder tatsächlich vorhanden sind und wie aktuell die Daten sind, hängt vom jeweiligen Datensatz ab; angezeigt werden die in der Quelle vorhandenen Haushaltspositionen.",
-    "",
-    "## Datenquelle",
-    "",
-    "Die Haushaltsdaten werden über die in `apiurls.haushalt` konfigurierte Ressource des Open-Data-Portals Rhein-Kreis Neuss bereitgestellt; die Katalogseite wird über `urlDaten` verlinkt.",
-    "",
-    "- **Open Data Portal:** [Open Data Rhein-Kreis Neuss](https://opendata.rhein-kreis-neuss.de/)",
-    "- **Datensatz:** [Offener Haushalt](https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/)",
-    "- **Ressource/API-Endpunkt:** [JSON-Export](https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin)",
-    "",
-    "Angezeigt werden die in der Quelle vorhandenen Haushaltspositionen; Verfügbarkeit und Stand hängen vom Pflegestand der Quelle ab.",
-    "",
-    "## Open Data App",
-    "",
-    "Diese App ist eine Open Data App und kann im [Open Data App Store](https://open-data-app-store.de/) betrieben werden. Sie ist Open Source und lässt sich mit kommunalen Haushaltsdaten konfigurieren.",
-    "",
-    "- [Open Data App Store](https://open-data-app-store.de/) – die Plattform für Open Data Apps",
-    "- [Alle Open Data Apps auf GitHub](https://github.com/open-data-apps) – die Organisation mit allen Apps",
-    "- [odas-app-offenerhaushalt](https://github.com/open-data-apps/odas-app-offenerhaushalt) – das Repository dieser App"
-  ],
-  "tags-funktion": [
-    "Haushalt",
-    "Finanzen",
-    "Visualisierung"
-  ],
-  "tags-dateityp": [
-    "JSON",
-    "CSV"
-  ],
-  "tags-datenart": [
-    "Haushaltsdaten",
-    "Finanzdaten"
-  ],
-  "screenshots": [
-    "assets/Desktop_Screenshot.png",
-    "assets/Desktop_Screenshot_2.png"
-  ],
-  "branding-css": "",
-  "api-version": "1",
-  "instanz-config": {
-    "seitentitel": {
-      "label": "Seitentitel",
-      "category": "allgemein",
-      "hilfe": "Der Seitentitel wird im Browser-Tab der App angezeigt",
-      "default": "Offener Haushalt",
-      "format": {
-        "typ": "string",
-        "laenge": 50
-      },
-      "erforderlich": "ja"
-    },
-    "titel": {
-      "label": "Titel",
-      "category": "allgemein",
-      "hilfe": "Der Titel wird in der Titelzeile der App angezeigt",
-      "default": "Offener Haushalt",
-      "format": {
-        "typ": "string",
-        "laenge": 50
-      },
-      "erforderlich": "ja"
-    },
-    "icon": {
-      "label": "App-Icon",
-      "category": "allgemein",
-      "hilfe": "Das Icon wird links oben in der Titelzeile angezeigt",
-      "default": "{{{odp.logo}}}",
-      "format": {
-        "typ": "image",
-        "hoehe": 100,
-        "breite": 300
-      },
-      "erforderlich": "ja"
-    },
-    "kontakt": {
-      "label": "Kontakt",
-      "category": "kontakt-rechtliches",
-      "hilfe": "Der Text wird im Menüpunkt 'Kontakt' angezeigt",
-      "format": {
-        "typ": "markdown"
-      },
-      "default": [
-        "_multiline_",
-        "Sie sind zufrieden mit der App oder haben Anregungen, Verbesserungen oder Hinweise, die Sie uns mitteilen möchten?",
-        "",
-        "Dann richten Sie sich gerne an uns. Wir freuen uns über alle Nachrichten. Ihre Nachrichten können Sie uns mitteilen über:",
-        "",
-        "- Tel.: [{{odp.anbieter.tel}}](tel:{{odp.anbieter.tel}})",
-        "- E-Mail: [{{odp.anbieter.email}}](mailto:{{odp.anbieter.email}})"
-      ],
-      "erforderlich": "ja"
-    },
-    "beschreibung": {
-      "label": "Beschreibung",
-      "category": "beschreibung",
-      "hilfe": "Der Text wird im Menüpunkt 'Über diese App' angezeigt",
-      "format": {
-        "typ": "markdown"
-      },
-      "default": [
+    "app-entwickler-id": "12343",
+    "app-entwickler-name": "ondics-gmbh",
+    "name-in-url": "offener-haushalt",
+    "name": "Offener Haushalt",
+    "app-version": "1.24.0",
+    "app-package-version": "2",
+    "odas-app-icon": "assets/odas-app-icon.svg",
+    "app-icon": "assets/odas-app-icon.svg",
+    "kurzbeschreibung": "Interaktive Visualisierung des kommunalen Haushalts – Einnahmen und Ausgaben nach Produktbereichen.",
+    "beschreibung": [
         "_multiline_",
         "Die Offener-Haushalt-App visualisiert kommunale Haushaltsdaten verständlich und interaktiv.",
         "",
@@ -143,7 +30,7 @@
         "",
         "- **Open Data Portal:** [Open Data Rhein-Kreis Neuss](https://opendata.rhein-kreis-neuss.de/)",
         "- **Datensatz:** [Offener Haushalt](https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/)",
-        "- **Ressource/API-Endpunkt:** [JSON-Export](https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin)",
+        "- **Ressource/API-Endpunkt:** [JSON-Export]({{{appinstanz.apiurls.1}}})",
         "",
         "Angezeigt werden die in der Quelle vorhandenen Haushaltspositionen; Verfügbarkeit und Stand hängen vom Pflegestand der Quelle ab.",
         "",
@@ -154,238 +41,351 @@
         "- [Open Data App Store](https://open-data-app-store.de/) – die Plattform für Open Data Apps",
         "- [Alle Open Data Apps auf GitHub](https://github.com/open-data-apps) – die Organisation mit allen Apps",
         "- [odas-app-offenerhaushalt](https://github.com/open-data-apps/odas-app-offenerhaushalt) – das Repository dieser App"
-      ],
-      "erforderlich": "ja"
-    },
-    "impressum": {
-      "label": "Impressum",
-      "category": "kontakt-rechtliches",
-      "hilfe": "Der Text wird im Menüpunkt 'Impressum' angezeigt",
-      "format": {
-        "typ": "markdown"
-      },
-      "default": [
-        "_multiline_",
-        "## Anbieter",
-        "",
-        "{{{odp.anbieter.orgName}}}  ",
-        "{{{odp.anbieter.orgUnit}}}",
-        "",
-        "{{odp.anbieter.strasse}}  ",
-        "{{odp.anbieter.plzort}}",
-        "",
-        "Website: [{{odp.anbieter.url}}]({{odp.anbieter.url}})",
-        "",
-        "## Ansprechpartner",
-        "",
-        "{{odp.anbieter.kontakt-bezeichnung}}  ",
-        "{{odp.anbieter.name}}",
-        "",
-        "## Kontakt",
-        "",
-        "Tel.: {{odp.anbieter.tel}}  ",
-        "E-Mail: [{{odp.anbieter.email}}](mailto:{{odp.anbieter.email}})"
-      ],
-      "erforderlich": "ja"
-    },
-    "datenschutz": {
-      "label": "Datenschutz",
-      "category": "kontakt-rechtliches",
-      "hilfe": "Der Text wird im Menüpunkt 'Datenschutz' angezeigt",
-      "format": {
-        "typ": "markdown"
-      },
-      "default": [
-        "_multiline_",
-        "Diese App verarbeitet die angezeigten offenen Daten ausschließlich im Browser. Es werden keine Cookies gesetzt, keine Nutzungsstatistiken erhoben und keine Daten im Browser gespeichert.",
-        "",
-        "Alle für die Darstellung benötigten Programmbibliotheken werden mit der App ausgeliefert. Beim Aufruf werden dafür keine externen Server kontaktiert.",
-        "",
-        "Die angezeigten Daten werden vom Browser direkt aus der konfigurierten Datenquelle geladen. Dabei werden technisch bedingt IP-Adresse und Browserkennung an deren Betreiber übermittelt. Maßgeblich ist der Schalter `proxyAktiv` der Instanz-Konfiguration."
-      ],
-      "erforderlich": "ja"
-    },
-    "urlDaten": {
-      "label": "URL zum Datensatz im ODP",
-      "category": "datenherkunft",
-      "hilfe": "Link zum Datensatz im Open Data Portal (für die Beschreibungsseite)",
-      "format": {
-        "typ": "url"
-      },
-      "default": "",
-      "beispiel": "",
-      "erforderlich": "ja"
-    },
-    "fusszeile": {
-      "label": "Fußzeile",
-      "category": "kontakt-rechtliches",
-      "hilfe": "Wird auf der Website unten in der Fusszeile angezeigt.",
-      "format": {
-        "typ": "string",
-        "laenge": 50
-      },
-      "default": "(C) Copyright {{jahr}} | App & Daten: {{odp.anbieter.name}} | App-Entwickler: {{app.developer.name}} | ODAS: {{odas.betreiber.name}}",
-      "erforderlich": "ja"
-    },
-    "proxyAktiv": {
-      "label": "ODAS-Proxy aktivieren",
-      "category": "datenherkunft",
-      "hilfe": "Mit ja werden Datenabrufe über den ODAS-Proxy gesendet. Der Proxy ist nur im ODAS-Live-System verfügbar; Entwicklung und Standalone verwenden nein.",
-      "default": "nein",
-      "format": {
-        "typ": "dropdown",
-        "optionen": [
-          "nein",
-          "ja"
-        ]
-      },
-      "erforderlich": "ja"
-    },
-    "apiurls": {
-      "label": "URLs zu Datenressourcen",
-      "category": "datenherkunft",
-      "hilfe": "Direkter Download-, Datei- oder API-Endpunkt der tatsächlich verwendeten Datenquelle(n). Mehrere Einträge möglich.",
-      "typ": "array",
-      "format": {
-        "typ": "url",
-        "laenge": 500
-      },
-      "urls": [
-        {
-          "name": "haushalt",
-          "label": "URL zu den Haushaltsdaten",
-          "default": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
-          "beispiel": "",
-          "erforderlich": "ja"
+    ],
+    "tags-funktion": [
+        "Haushalt",
+        "Finanzen",
+        "Visualisierung"
+    ],
+    "tags-dateityp": [
+        "JSON",
+        "CSV"
+    ],
+    "tags-datenart": [
+        "Haushaltsdaten",
+        "Finanzdaten"
+    ],
+    "screenshots": [
+        "assets/Desktop_Screenshot.png",
+        "assets/Desktop_Screenshot_2.png"
+    ],
+    "branding-css": "",
+    "api-version": "1",
+    "instanz-config": {
+        "seitentitel": {
+            "label": "Seitentitel",
+            "category": "allgemein",
+            "hilfe": "Der Seitentitel wird im Browser-Tab der App angezeigt",
+            "default": "Offener Haushalt",
+            "format": {
+                "typ": "string",
+                "laenge": 50
+            },
+            "erforderlich": "ja"
+        },
+        "titel": {
+            "label": "Titel",
+            "category": "allgemein",
+            "hilfe": "Der Titel wird in der Titelzeile der App angezeigt",
+            "default": "Offener Haushalt",
+            "format": {
+                "typ": "string",
+                "laenge": 50
+            },
+            "erforderlich": "ja"
+        },
+        "icon": {
+            "label": "App-Icon",
+            "category": "allgemein",
+            "hilfe": "Das Icon wird links oben in der Titelzeile angezeigt",
+            "default": "{{{odp.logo}}}",
+            "format": {
+                "typ": "image",
+                "hoehe": 100,
+                "breite": 300
+            },
+            "erforderlich": "ja"
+        },
+        "kontakt": {
+            "label": "Kontakt",
+            "category": "kontakt-rechtliches",
+            "hilfe": "Der Text wird im Menüpunkt 'Kontakt' angezeigt",
+            "format": {
+                "typ": "markdown"
+            },
+            "default": [
+                "_multiline_",
+                "Sie sind zufrieden mit der App oder haben Anregungen, Verbesserungen oder Hinweise, die Sie uns mitteilen möchten?",
+                "",
+                "Dann richten Sie sich gerne an uns. Wir freuen uns über alle Nachrichten. Ihre Nachrichten können Sie uns mitteilen über:",
+                "",
+                "- Tel.: [{{odp.anbieter.tel}}](tel:{{odp.anbieter.tel}})",
+                "- E-Mail: [{{odp.anbieter.email}}](mailto:{{odp.anbieter.email}})"
+            ],
+            "erforderlich": "ja"
+        },
+        "beschreibung": {
+            "label": "Beschreibung",
+            "category": "beschreibung",
+            "hilfe": "Der Text wird im Menüpunkt 'Über diese App' angezeigt",
+            "format": {
+                "typ": "markdown"
+            },
+            "default": [
+                "_multiline_",
+                "Die Offener-Haushalt-App visualisiert kommunale Haushaltsdaten verständlich und interaktiv.",
+                "",
+                "Einnahmen und Ausgaben werden nach Produktbereichen und Produktgruppen dargestellt, sodass finanzielle Schwerpunkte besser nachvollziehbar werden. Für wen ist diese App? Sie richtet sich an Bürger:innen, Kommunalpolitik, Verwaltung, Medien und Initiativen, die Haushaltsdaten verständlich betrachten möchten – besondere Datenkenntnisse sind nicht erforderlich.",
+                "",
+                "## Methodik",
+                "",
+                "Die App lädt die in `apiurls.haushalt` konfigurierte Quelle im Browser – direkt oder optional über den ODAS-Proxy (`proxyAktiv`) – und erkennt das Format automatisch: Liefert die Quelle JSON, werden die gelieferten Strukturen normalisiert; liefert sie CSV, wird sie über PapaParse mit automatischer Delimiter-Erkennung geparst.",
+                "",
+                "Unterstützte JSON-Formen sind CKAN (`result.records`), OpenDataSoft v1 (`records` mit `fields`), OpenDataSoft v2 (`results`) sowie direktes Array oder Objekte mit `data` bzw. `items`. Feldnamen werden per Alias-Suche normalisiert (`produktbereich`/`bereich`/`hauptgruppe`, `produktgruppe`/`gruppe`/`untergruppe`, `haushaltsjahr`/`jahr`/`year`/`geschaeftsjahr`, `ertragaufwand`/`richtung`/`typ`/`art`/`einnahmenausgaben`, `betrag`/`wert`/`summe`/`plan`/`ansatz`); Beträge werden als Zahlen oder Strings mit deutscher oder Dezimal-Schreibweise interpretiert (z. B. `1.234,56` → 1234.56).",
+                "",
+                "Die Oberfläche erlaubt die Filterung nach Haushaltsjahr (Schalter `haushaltsjahr` oder Auswahl in der App), nach Ansicht (Erträge/Einnahmen, Aufwand/Ausgaben oder beide) und per Freitextsuche über Produktbereich und Produktgruppe. Aus den gefilterten Datensätzen gruppiert die App zweistufig nach Produktbereich → Produktgruppe, berechnet Summen für Erträge und Aufwand, daraus den Saldo (Erträge minus Aufwand) und die Anzahl der Produktbereiche, und zeigt sie als KPI-Kacheln, als Balkendiagramm nach Produktbereich mit Drill-down auf die Gruppen eines Bereichs sowie als gruppierte Detailtabelle.",
+                "",
+                "Welche Produktbereiche, Gruppen, Jahre, Typen und Betragsfelder tatsächlich vorhanden sind und wie aktuell die Daten sind, hängt vom jeweiligen Datensatz ab; angezeigt werden die in der Quelle vorhandenen Haushaltspositionen.",
+                "",
+                "## Datenquelle",
+                "",
+                "Die Haushaltsdaten werden über die in `apiurls.haushalt` konfigurierte Ressource des Open-Data-Portals Rhein-Kreis Neuss bereitgestellt; die Katalogseite wird über `urlDaten` verlinkt.",
+                "",
+                "- **Open Data Portal:** [Open Data Rhein-Kreis Neuss](https://opendata.rhein-kreis-neuss.de/)",
+                "- **Datensatz:** [Offener Haushalt](https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/)",
+                "- **Ressource/API-Endpunkt:** [JSON-Export]({{{appinstanz.apiurls.1}}})",
+                "",
+                "Angezeigt werden die in der Quelle vorhandenen Haushaltspositionen; Verfügbarkeit und Stand hängen vom Pflegestand der Quelle ab.",
+                "",
+                "## Open Data App",
+                "",
+                "Diese App ist eine Open Data App und kann im [Open Data App Store](https://open-data-app-store.de/) betrieben werden. Sie ist Open Source und lässt sich mit kommunalen Haushaltsdaten konfigurieren.",
+                "",
+                "- [Open Data App Store](https://open-data-app-store.de/) – die Plattform für Open Data Apps",
+                "- [Alle Open Data Apps auf GitHub](https://github.com/open-data-apps) – die Organisation mit allen Apps",
+                "- [odas-app-offenerhaushalt](https://github.com/open-data-apps/odas-app-offenerhaushalt) – das Repository dieser App"
+            ],
+            "erforderlich": "ja"
+        },
+        "impressum": {
+            "label": "Impressum",
+            "category": "kontakt-rechtliches",
+            "hilfe": "Der Text wird im Menüpunkt 'Impressum' angezeigt",
+            "format": {
+                "typ": "markdown"
+            },
+            "default": [
+                "_multiline_",
+                "## Anbieter",
+                "",
+                "{{{odp.anbieter.orgName}}}  ",
+                "{{{odp.anbieter.orgUnit}}}",
+                "",
+                "{{odp.anbieter.strasse}}  ",
+                "{{odp.anbieter.plzort}}",
+                "",
+                "Website: [{{odp.anbieter.url}}]({{odp.anbieter.url}})",
+                "",
+                "## Ansprechpartner",
+                "",
+                "{{odp.anbieter.kontakt-bezeichnung}}  ",
+                "{{odp.anbieter.name}}",
+                "",
+                "## Kontakt",
+                "",
+                "Tel.: {{odp.anbieter.tel}}  ",
+                "E-Mail: [{{odp.anbieter.email}}](mailto:{{odp.anbieter.email}})"
+            ],
+            "erforderlich": "ja"
+        },
+        "datenschutz": {
+            "label": "Datenschutz",
+            "category": "kontakt-rechtliches",
+            "hilfe": "Der Text wird im Menüpunkt 'Datenschutz' angezeigt",
+            "format": {
+                "typ": "markdown"
+            },
+            "default": [
+                "_multiline_",
+                "Diese App verarbeitet die angezeigten offenen Daten ausschließlich im Browser. Es werden keine Cookies gesetzt, keine Nutzungsstatistiken erhoben und keine Daten im Browser gespeichert.",
+                "",
+                "Alle für die Darstellung benötigten Programmbibliotheken werden mit der App ausgeliefert. Beim Aufruf werden dafür keine externen Server kontaktiert.",
+                "",
+                "Die angezeigten Daten werden vom Browser direkt aus der konfigurierten Datenquelle geladen. Dabei werden technisch bedingt IP-Adresse und Browserkennung an deren Betreiber übermittelt. Maßgeblich ist der Schalter `proxyAktiv` der Instanz-Konfiguration."
+            ],
+            "erforderlich": "ja"
+        },
+        "urlDaten": {
+            "label": "URL zum Datensatz im ODP",
+            "category": "datenherkunft",
+            "hilfe": "Link zum Datensatz im Open Data Portal (für die Beschreibungsseite)",
+            "format": {
+                "typ": "url"
+            },
+            "default": "",
+            "beispiel": "",
+            "erforderlich": "ja"
+        },
+        "fusszeile": {
+            "label": "Fußzeile",
+            "category": "kontakt-rechtliches",
+            "hilfe": "Wird auf der Website unten in der Fusszeile angezeigt.",
+            "format": {
+                "typ": "string",
+                "laenge": 50
+            },
+            "default": "(C) Copyright {{jahr}} | App & Daten: {{odp.anbieter.name}} | App-Entwickler: {{app.developer.name}} | ODAS: {{odas.betreiber.name}}",
+            "erforderlich": "ja"
+        },
+        "proxyAktiv": {
+            "label": "ODAS-Proxy aktivieren",
+            "category": "datenherkunft",
+            "hilfe": "Mit ja werden Datenabrufe über den ODAS-Proxy gesendet. Der Proxy ist nur im ODAS-Live-System verfügbar; Entwicklung und Standalone verwenden nein.",
+            "default": "nein",
+            "format": {
+                "typ": "dropdown",
+                "optionen": [
+                    "nein",
+                    "ja"
+                ]
+            },
+            "erforderlich": "ja"
+        },
+        "apiurls": {
+            "label": "URLs zu Datenressourcen",
+            "category": "datenherkunft",
+            "hilfe": "Direkter Download-, Datei- oder API-Endpunkt der tatsächlich verwendeten Datenquelle(n). Mehrere Einträge möglich.",
+            "typ": "array",
+            "format": {
+                "typ": "url",
+                "laenge": 500
+            },
+            "urls": [
+                {
+                    "name": "haushalt",
+                    "label": "URL zu den Haushaltsdaten",
+                    "default": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
+                    "beispiel": "",
+                    "erforderlich": "ja"
+                }
+            ]
+        },
+        "weiterfuehrendeLinks": {
+            "label": "Weiterführende Links",
+            "category": "beschreibung",
+            "hilfe": "Verwandte Datensätze / Hintergrundquellen (HTML/Markdown). Leer = ausgeblendet.",
+            "format": {
+                "typ": "markdown"
+            },
+            "default": "- [Open Data Rhein-Kreis Neuss](https://opendata.rhein-kreis-neuss.de/)\n- [Datensatz Offener Haushalt](https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/)\n- [Open Data App Store](https://open-data-app-store.de)",
+            "erforderlich": "nein"
+        },
+        "datenStand": {
+            "label": "Datenstand",
+            "category": "beschreibung",
+            "hilfe": "Freitext-Hinweis zum Stand der Daten. Leer = ausgeblendet.",
+            "format": {
+                "typ": "string"
+            },
+            "default": "Stand: abhängig von Datenquelle",
+            "erforderlich": "nein"
+        },
+        "haushaltsjahr": {
+            "label": "Haushaltsjahr filtern",
+            "category": "sonstiges",
+            "hilfe": "Optional: Zeigt nur das angegebene Haushaltsjahr an (z.B. 2024). Leer lassen für alle verfügbaren Jahre.",
+            "format": {
+                "typ": "string",
+                "laenge": 4
+            },
+            "default": "",
+            "beispiel": "2024",
+            "erforderlich": "nein"
+        },
+        "sprache": {
+            "label": "Sprache der App",
+            "category": "allgemein",
+            "hilfe": "Angabe der App-Sprache",
+            "default": "de",
+            "format": {
+                "typ": "dropdown",
+                "optionen": [
+                    "de"
+                ]
+            },
+            "erforderlich": "ja"
+        },
+        "datenquelleHinweis": {
+            "label": "Methodik / Datenquelle-Hinweis",
+            "category": "beschreibung",
+            "hilfe": "Herkunft, Erhebungsmethode und Limitierungen (HTML/Markdown). Leer = ausgeblendet.",
+            "format": {
+                "typ": "markdown"
+            },
+            "default": "Die Haushaltsdaten werden aus einer konfigurierten OpenDataSoft-Quelle geladen und nach Produktbereichen sowie Produktgruppen visualisiert. Die App stellt veröffentlichte Haushaltswerte transparent dar, ersetzt aber keine Haushaltsberatung oder amtliche Beschlussvorlage.",
+            "erforderlich": "nein"
+        },
+        "kpiKontext1": {
+            "label": "KPI-Erklärung 1: Gesamte Erträge",
+            "category": "beschreibung",
+            "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
+            "format": {
+                "typ": "string",
+                "laenge": 250
+            },
+            "default": "Summe aller Erträge und Einnahmen des Haushalts — z.B. Steuern, Gebühren, Zuweisungen. Zeigt, wie viel Geld insgesamt eingenommen wird.",
+            "erforderlich": "nein"
+        },
+        "kpiKontext2": {
+            "label": "KPI-Erklärung 2: Gesamter Aufwand",
+            "category": "beschreibung",
+            "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
+            "format": {
+                "typ": "string",
+                "laenge": 250
+            },
+            "default": "Summe aller Aufwendungen und Ausgaben — z.B. Personal, Infrastruktur, Soziales. Zeigt, wofür das Geld verwendet wird.",
+            "erforderlich": "nein"
+        },
+        "kpiKontext3": {
+            "label": "KPI-Erklärung 3: Saldo",
+            "category": "beschreibung",
+            "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
+            "format": {
+                "typ": "string",
+                "laenge": 250
+            },
+            "default": "Differenz zwischen Erträgen und Aufwendungen. Positiv = Überschuss, negativ = Defizit. Ein zentraler Indikator der Haushaltslage.",
+            "erforderlich": "nein"
+        },
+        "kpiKontext4": {
+            "label": "KPI-Erklärung 4: Produktbereiche",
+            "category": "beschreibung",
+            "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
+            "format": {
+                "typ": "string",
+                "laenge": 250
+            },
+            "default": "Anzahl der verschiedenen Produktbereiche im Haushaltsplan (z.B. Schule, Verkehr, Soziales). Zeigt die strukturelle Gliederung.",
+            "erforderlich": "nein"
+        },
+        "brandingCSS": {
+            "label": "Zusätzliches Branding-CSS",
+            "category": "sonstiges",
+            "hilfe": "Optionaler CSS-Code für die konkrete App-Instanz.",
+            "default": "",
+            "format": {
+                "typ": "string",
+                "laenge": 10000
+            },
+            "erforderlich": "nein"
+        },
+        "brandingCSSFile": {
+            "label": "Branding-CSS-Datei",
+            "category": "sonstiges",
+            "hilfe": "Optionale URL zu einer zusätzlichen CSS-Datei für die konkrete App-Instanz.",
+            "default": "",
+            "format": {
+                "typ": "url",
+                "laenge": 500
+            },
+            "erforderlich": "nein"
         }
-      ]
     },
-    "weiterfuehrendeLinks": {
-      "label": "Weiterführende Links",
-      "category": "beschreibung",
-      "hilfe": "Verwandte Datensätze / Hintergrundquellen (HTML/Markdown). Leer = ausgeblendet.",
-      "format": {
-        "typ": "markdown"
-      },
-      "default": "- [Open Data Rhein-Kreis Neuss](https://opendata.rhein-kreis-neuss.de/)\n- [Datensatz Offener Haushalt](https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/)\n- [Open Data App Store](https://open-data-app-store.de)",
-      "erforderlich": "nein"
-    },
-    "datenStand": {
-      "label": "Datenstand",
-      "category": "beschreibung",
-      "hilfe": "Freitext-Hinweis zum Stand der Daten. Leer = ausgeblendet.",
-      "format": {
-        "typ": "string"
-      },
-      "default": "Stand: abhängig von Datenquelle",
-      "erforderlich": "nein"
-    },
-    "haushaltsjahr": {
-      "label": "Haushaltsjahr filtern",
-      "category": "sonstiges",
-      "hilfe": "Optional: Zeigt nur das angegebene Haushaltsjahr an (z.B. 2024). Leer lassen für alle verfügbaren Jahre.",
-      "format": {
-        "typ": "string",
-        "laenge": 4
-      },
-      "default": "",
-      "beispiel": "2024",
-      "erforderlich": "nein"
-    },
-    "sprache": {
-      "label": "Sprache der App",
-      "category": "allgemein",
-      "hilfe": "Angabe der App-Sprache",
-      "default": "de",
-      "format": {
-        "typ": "dropdown",
-        "optionen": [
-          "de"
-        ]
-      },
-      "erforderlich": "ja"
-    },
-    "datenquelleHinweis": {
-      "label": "Methodik / Datenquelle-Hinweis",
-      "category": "beschreibung",
-      "hilfe": "Herkunft, Erhebungsmethode und Limitierungen (HTML/Markdown). Leer = ausgeblendet.",
-      "format": {
-        "typ": "markdown"
-      },
-      "default": "Die Haushaltsdaten werden aus einer konfigurierten OpenDataSoft-Quelle geladen und nach Produktbereichen sowie Produktgruppen visualisiert. Die App stellt veröffentlichte Haushaltswerte transparent dar, ersetzt aber keine Haushaltsberatung oder amtliche Beschlussvorlage.",
-      "erforderlich": "nein"
-    },
-    "kpiKontext1": {
-      "label": "KPI-Erklärung 1: Gesamte Erträge",
-      "category": "beschreibung",
-      "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
-      "format": {
-        "typ": "string",
-        "laenge": 250
-      },
-      "default": "Summe aller Erträge und Einnahmen des Haushalts — z.B. Steuern, Gebühren, Zuweisungen. Zeigt, wie viel Geld insgesamt eingenommen wird.",
-      "erforderlich": "nein"
-    },
-    "kpiKontext2": {
-      "label": "KPI-Erklärung 2: Gesamter Aufwand",
-      "category": "beschreibung",
-      "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
-      "format": {
-        "typ": "string",
-        "laenge": 250
-      },
-      "default": "Summe aller Aufwendungen und Ausgaben — z.B. Personal, Infrastruktur, Soziales. Zeigt, wofür das Geld verwendet wird.",
-      "erforderlich": "nein"
-    },
-    "kpiKontext3": {
-      "label": "KPI-Erklärung 3: Saldo",
-      "category": "beschreibung",
-      "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
-      "format": {
-        "typ": "string",
-        "laenge": 250
-      },
-      "default": "Differenz zwischen Erträgen und Aufwendungen. Positiv = Überschuss, negativ = Defizit. Ein zentraler Indikator der Haushaltslage.",
-      "erforderlich": "nein"
-    },
-    "kpiKontext4": {
-      "label": "KPI-Erklärung 4: Produktbereiche",
-      "category": "beschreibung",
-      "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
-      "format": {
-        "typ": "string",
-        "laenge": 250
-      },
-      "default": "Anzahl der verschiedenen Produktbereiche im Haushaltsplan (z.B. Schule, Verkehr, Soziales). Zeigt die strukturelle Gliederung.",
-      "erforderlich": "nein"
-    },
-    "brandingCSS": {
-      "label": "Zusätzliches Branding-CSS",
-      "category": "sonstiges",
-      "hilfe": "Optionaler CSS-Code für die konkrete App-Instanz.",
-      "default": "",
-      "format": {
-        "typ": "string",
-        "laenge": 10000
-      },
-      "erforderlich": "nein"
-    },
-    "brandingCSSFile": {
-      "label": "Branding-CSS-Datei",
-      "category": "sonstiges",
-      "hilfe": "Optionale URL zu einer zusätzlichen CSS-Datei für die konkrete App-Instanz.",
-      "default": "",
-      "format": {
-        "typ": "url",
-        "laenge": 500
-      },
-      "erforderlich": "nein"
+    "daten": {
+        "beschreibung": "Die Offener Haushalt-App verarbeitet konfigurierbare Open-Data-Ressourcen aus dem Open Data Portal (z.B. JSON- oder CSV-Endpunkte).",
+        "schema": "assets/schema.json",
+        "beispiel": "",
+        "beispiel-url": ""
     }
-  },
-  "daten": {
-    "beschreibung": "Die Offener Haushalt-App verarbeitet konfigurierbare Open-Data-Ressourcen aus dem Open Data Portal (z.B. JSON- oder CSV-Endpunkte).",
-    "schema": "assets/schema.json",
-    "beispiel": "",
-    "beispiel-url": ""
-  }
 }
