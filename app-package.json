@@ -3,7 +3,7 @@
   "app-entwickler-name": "ondics-gmbh",
   "name-in-url": "offener-haushalt",
   "name": "Offener Haushalt",
-  "app-version": "1.24.0",
+  "app-version": "1.24.1",
   "app-package-version": "2",
   "odas-app-icon": "assets/odas-app-icon.svg",
   "app-icon": "assets/odas-app-icon.svg",
@@ -212,8 +212,8 @@
       "format": {
         "typ": "url"
       },
-      "default": "",
-      "beispiel": "",
+      "default": "https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/table/",
+      "beispiel": "https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/table/",
       "erforderlich": "ja"
     },
     "fusszeile": {
@@ -255,7 +255,7 @@
           "name": "haushalt",
           "label": "Open-Data-Suche oder Tabellen-API – Haushalt",
           "default": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
-          "beispiel": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-haushalt/exports/json",
+          "beispiel": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&timezone=Europe%2FBerlin",
           "erforderlich": "ja"
         }
       ]
@@ -385,7 +385,7 @@
   "daten": {
     "beschreibung": "Die Offener Haushalt-App verarbeitet konfigurierbare Open-Data-Ressourcen aus dem Open Data Portal (z.B. JSON- oder CSV-Endpunkte).",
     "schema": "assets/schema.json",
-    "beispiel": "",
-    "beispiel-url": ""
+    "beispiel": "OpenDataSoft-Exports-Antwort als JSON-Array (Felder produktbereich, produktgruppe, kostenart, typ, jahr, betrag, richtung).",
+    "beispiel-url": "https://opendata.rhein-kreis-neuss.de/api/explore/v2.1/catalog/datasets/rhein-kreis-neuss-offener-haushalt/exports/json?lang=de&limit=5"
   }
 }

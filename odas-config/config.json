@@ -38,7 +38,7 @@
     "<p>Alle für die Darstellung benötigten Programmbibliotheken werden mit der App ausgeliefert. Beim Aufruf werden dafür keine externen Server kontaktiert.</p>",
     "<p>Die angezeigten Daten werden vom Browser direkt aus der konfigurierten Datenquelle geladen. Dabei werden technisch bedingt IP-Adresse und Browserkennung an deren Betreiber übermittelt. Maßgeblich ist der Schalter <code>proxyAktiv</code> der Instanz-Konfiguration.</p>"
   ],
-  "urlDaten": "https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/information/",
+  "urlDaten": "https://opendata.rhein-kreis-neuss.de/explore/dataset/rhein-kreis-neuss-offener-haushalt/table/",
   "fusszeile": [
     "(C) Copyright 2026 | ",
     "App-Entwickler: Ondics GmbH"

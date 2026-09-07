@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.24.1 - 2026-09-07
+- **FIX:** Frictionless-Härtung: totes Beispiel-Dataset (404) auf existierenden Default angeglichen; `urlDaten` gesetzt (Spiegel angeglichen); `daten.beispiel`/`beispiel-url` befüllt. Exports-JSON ist Validator-blind (json-safe) — Key-Match (7/7) manuell verifiziert.
+
 ## 1.24.0 - 2026-08-25
 - **CHG:** Proxy-Aufruf sendet die vollständige Ziel-URL statt nur Pfad+Query, damit die neue Origin-Allowlist-Prüfung der ODAS-Plattform greift (bisher implizite Auflösung gegen den ersten konfigurierten `apiurl`).
 - **FIX:** Tote Anbieter-Shortcodes in Kontakt/Impressum ersetzt (`{{odp.anbieter.url-extern}}` → `{{odp.anbieter.url}}`, `tel:{{odp.anbieter.telcode}}` → `tel:{{odp.anbieter.tel}}`).
