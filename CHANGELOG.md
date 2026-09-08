@@ -1,7 +1,9 @@
 # Changelog
 
-## 1.24.1 - 2026-09-07
+## 1.24.2 - 2026-09-08
 - **FIX:** Variante-A-Verdrahtung (F-92): Typprüfung (ods21) vor dem ersten Fetch; Quellen- und Ladefehler über `renderOdasFehler`; Fixture auf v2.1-URL umgestellt (1.24.1 -> 1.24.2).
+
+## 1.24.1 - 2026-09-07
 - **FIX:** Frictionless-Härtung: totes Beispiel-Dataset (404) auf existierenden Default angeglichen; `urlDaten` gesetzt (Spiegel angeglichen); `daten.beispiel`/`beispiel-url` befüllt. Exports-JSON ist Validator-blind (json-safe) — Key-Match (7/7) manuell verifiziert.
 
 ## 1.24.0 - 2026-08-25
