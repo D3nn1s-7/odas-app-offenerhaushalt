@@ -374,6 +374,23 @@ function app(configdata = {}, enclosingHtmlDivElement) {
     }
   });
 
+  // Variante A (F-92): Typ- und Quellenpruefung vor dem ersten Fetch.
+  const ohKontext = {
+    url: apiUrl,
+    label: "Haushalts-API",
+    typLabel: "Open-Data-Suche (API v2.1)",
+    erwarteterTyp: "ods21",
+  };
+  if (isKeineDatenquelleKonfiguriert(apiUrl)) {
+    renderOdasFehler(enclosingHtmlDivElement, new Error("Keine Datenquelle konfiguriert."), ohKontext);
+    return null;
+  }
+  const ohTypWarn = validateUrlTypErwartung(apiUrl, "ods21");
+  if (ohTypWarn) {
+    renderOdasFehler(enclosingHtmlDivElement, new Error(ohTypWarn), ohKontext);
+    return null;
+  }
+
   // ──────────────────────────────────────────────
   // 0. Ladeanimation mit Fortschrittsbalken
   // ──────────────────────────────────────────────
@@ -484,12 +501,7 @@ function app(configdata = {}, enclosingHtmlDivElement) {
     })
     .catch((err) => {
       if (runtime.disposed) return;
-      enclosingHtmlDivElement.innerHTML = `
-        <div class="alert alert-danger mt-4">
-          <strong>Fehler beim Laden der Daten:</strong> ${escapeHtml(err.message)}
-          <hr>
-          <small>URL: <code>${escapeHtml(apiUrl)}</code></small>
-        </div>`;
+      renderOdasFehler(enclosingHtmlDivElement, err, ohKontext);
     });
 
   // Daten laden: direkt mit Fortschrittsanzeige, ueber den ODAS-Proxy ohne.
