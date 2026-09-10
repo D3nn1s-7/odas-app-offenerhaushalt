@@ -18,3 +18,13 @@
 .oh-kpi-info-toggle:hover, .oh-kpi-info-toggle:focus-visible, .oh-kpi-info-toggle:not(.collapsed) { color: var(--bs-primary); background: rgba(var(--bs-primary-rgb), 0.08); outline: none; }
 .oh-kpi-info-icon { font-size: 1rem; line-height: 1; }
 .oh-kpi-kontext { margin-top: 0.5rem; color: var(--bs-secondary-color); font-size: 0.875rem; line-height: 1.4; }
+
+/* OH-B4: aus addToHead hierher umgezogen (kein <style> mehr im Head,
+   Selektoren instanz-sicher über ID-Präfix statt nackter IDs). */
+[id^="oh-chart-"] { cursor: pointer; }
+[id^="oh-kpis-"] .card { transition: box-shadow 0.2s; }
+[id^="oh-kpis-"] .card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+.oh-hint { font-size: 0.8rem; color: #6c757d; margin-top: 4px; }
+
+/* Tabellenzeilen mit Drilldown-Ziel */
+.oh-clickable-row { cursor: pointer; }

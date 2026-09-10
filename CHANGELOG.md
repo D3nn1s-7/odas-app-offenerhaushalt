@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.24.3 - 2026-09-10
+- **FIX:** Same-Page-Re-Render räumt alte Charts ab (OH-B1, previous-cleanup vor `ohCleanups.set`).
+- **FIX:** Typ-Gate lässt CKAN-Tabellen und statische CSV/JSON-Dateien zu (OH-B2, `erwarteteTypen`); vorhandene Parser dahinter waren sonst unerreichbar.
+- **FIX:** JSON-Fehlerseiten melden freundlich statt rohem SyntaxError (OH-B3, `ohParseJson`); toter Code (`isLeerErgebnis`, doppelter `!apiUrl`-Zweig) entfernt (OH-B5, `safeHttpUrl` bleibt F-35-Vertrag).
+- **FIX:** `addToHead` injiziert kein `<style>` mehr in den Head (OH-B4, tote IDs) — Regeln liegen instanz-sicher in `app.css`.
+- **ROBUST:** Suche entprellt (250 ms, mit Leave-Guard); englische Betragsformate (`1,234.56`); Betrags-Spaltenfallback über 10 Zeilen; `scope="col"`; Drilldown-Scroll mit Null-Guard; Typ-Klassifikation an einer Stelle.
+- **FEATURE:** Verlaufsdiagramm (Einnahmen/Ausgaben pro Jahr, ab 2 Jahren, jahrunabhängig); CSV-Export der Filteransicht (BOM); Tabellenzeilen-Klick öffnet den Bereichs-Drilldown.
+
 ## 1.24.2 - 2026-09-08
 - **FIX:** Variante-A-Verdrahtung (F-92): Typprüfung (ods21) vor dem ersten Fetch; Quellen- und Ladefehler über `renderOdasFehler`; Fixture auf v2.1-URL umgestellt (1.24.1 -> 1.24.2).
 

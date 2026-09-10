@@ -153,6 +153,20 @@ async function fetchOdasJson(targetUrl, configdata = {}) {
   }
 }
 
+// OH-B3: JSON.parse direkt auf Fetch-Ergebnisse wirft bei HTML-Fehlerseiten
+// einen rohen SyntaxError (F-66-Klasse) — stattdessen freundlich melden.
+function ohParseJson(text) {
+  try {
+    return JSON.parse(text);
+  } catch (_e) {
+    throw new Error(
+      `Die konfigurierte Daten-URL liefert kein JSON, sondern ${describeNonJsonPayload(text)}. ` +
+        "Bitte in der Instanzkonfiguration den API-Endpunkt der Datenquelle eintragen, " +
+        "nicht den Datensatz- oder Download-Link.",
+    );
+  }
+}
+
 function describeNonJsonPayload(rawContent) {
   const text = String(rawContent == null ? "" : rawContent).trim();
   if (!text) return "eine leere Antwort";
@@ -288,7 +302,16 @@ function classifyOdasFehler(error, kontext = {}) {
 
 function renderOdasFehler(container, error, kontext = {}) {
   if (!container) return;
-  const typWarn = validateUrlTypErwartung(kontext.url, kontext.erwarteterTyp);
+  // Mehrere akzeptierte URL-Typen (z. B. ODS-Suche, CKAN-Tabelle oder
+  // statische Datei): erst warnen, wenn kein einziger passt.
+  const typen = Array.isArray(kontext.erwarteteTypen) && kontext.erwarteteTypen.length
+    ? kontext.erwarteteTypen
+    : [kontext.erwarteterTyp];
+  let typWarn = null;
+  for (const t of typen) {
+    typWarn = validateUrlTypErwartung(kontext.url, t);
+    if (!typWarn) break;
+  }
   if (typWarn && !/Typ passt nicht/i.test(String(error && error.message))) {
     error = new Error(typWarn);
   }
@@ -299,16 +322,6 @@ function renderOdasFehler(container, error, kontext = {}) {
   const alertClass = kontext.leer ? "alert-info" : info.alertClass;
   container.innerHTML = `<div class="alert ${alertClass}" role="alert"><strong>${escapeHtml(titel)}</strong><p class="mb-1">${escapeHtml(info.hinweis)}</p>${urlZeile}<details class="small"><summary>Details</summary><code>${escapeHtml(info.detail || String(error))}</code></details></div>`;
 }
-
-function isLeerErgebnis(json) {
-  if (!json) return true;
-  if (Array.isArray(json) && json.length === 0) return true;
-  if (Array.isArray(json.records) && json.records.length === 0) return true;
-  if (Array.isArray(json.results) && json.results.length === 0) return true;
-  if (json.result && Array.isArray(json.result.records) && json.result.records.length === 0) return true;
-  return false;
-}
-
 
 // PapaParse (CSV-Parsing) dynamisch aus app/vendor laden; Promise-basiert.
 // F-72: ersetzt den vormals selbstgeschriebenen CSV-Parser, der bei
@@ -357,7 +370,16 @@ function app(configdata = {}, enclosingHtmlDivElement) {
     renderTimeout: null,
     bereichChart: null,
     gruppeChart: null,
+    verlaufChart: null,
   };
+  // OH-B1: vorherigen Cleanup desselben Containers zuerst laufen lassen —
+  // sonst leakt bei Same-Page-Re-Render die alte Chart-Instanz.
+  const ohVorherigerCleanup = ohCleanups.get(enclosingHtmlDivElement);
+  if (ohVorherigerCleanup) {
+    try {
+      ohVorherigerCleanup();
+    } catch (_e) {}
+  }
   ohCleanups.set(enclosingHtmlDivElement, () => {
     runtime.disposed = true;
     if (runtime.renderTimeout !== null) {
@@ -372,20 +394,28 @@ function app(configdata = {}, enclosingHtmlDivElement) {
       runtime.gruppeChart.destroy();
       runtime.gruppeChart = null;
     }
+    if (runtime.verlaufChart) {
+      runtime.verlaufChart.destroy();
+      runtime.verlaufChart = null;
+    }
   });
 
   // Variante A (F-92): Typ- und Quellenpruefung vor dem ersten Fetch.
+  // OH-B2: neben der ODS-Suche sind CKAN-Tabellen und statische Dateien
+  // zulässig — ladeDaten/parseJson/parseCsv können sie längst.
   const ohKontext = {
     url: apiUrl,
     label: "Haushalts-API",
     typLabel: "Open-Data-Suche (API v2.1)",
-    erwarteterTyp: "ods21",
+    erwarteteTypen: ["ods21", "ckan-dkan-ds", "csv-zip"],
   };
   if (isKeineDatenquelleKonfiguriert(apiUrl)) {
     renderOdasFehler(enclosingHtmlDivElement, new Error("Keine Datenquelle konfiguriert."), ohKontext);
     return null;
   }
-  const ohTypWarn = validateUrlTypErwartung(apiUrl, "ods21");
+  const ohOdsWarn = validateUrlTypErwartung(apiUrl, "ods21");
+  const ohCkanWarn = ohOdsWarn ? validateUrlTypErwartung(apiUrl, "ckan-dkan-ds") : null;
+  const ohTypWarn = ohCkanWarn && validateUrlTypErwartung(apiUrl, "csv-zip") ? ohOdsWarn : null;
   if (ohTypWarn) {
     renderOdasFehler(enclosingHtmlDivElement, new Error(ohTypWarn), ohKontext);
     return null;
@@ -454,14 +484,6 @@ function app(configdata = {}, enclosingHtmlDivElement) {
     if (detEl && detail !== undefined) detEl.textContent = detail;
   }
 
-  if (!apiUrl) {
-    enclosingHtmlDivElement.innerHTML = `
-      <div class="alert alert-info mt-4" role="alert">
-        Es ist keine Datenquelle konfiguriert.
-      </div>`;
-    return null;
-  }
-
   // ──────────────────────────────────────────────
   // 1. Daten laden
   // ──────────────────────────────────────────────
@@ -518,7 +540,7 @@ function app(configdata = {}, enclosingHtmlDivElement) {
         if (runtime.disposed) return null;
         return parseCsv(text);
       }
-      return { records: parseJson(JSON.parse(text)), verworfen: 0 };
+      return { records: parseJson(ohParseJson(text)), verworfen: 0 };
     }
 
     const response = await fetch(apiUrl);
@@ -547,7 +569,7 @@ function app(configdata = {}, enclosingHtmlDivElement) {
       if (runtime.disposed) return null;
       return parseCsv(text);
     }
-    return { records: parseJson(JSON.parse(text)), verworfen: 0 };
+    return { records: parseJson(ohParseJson(text)), verworfen: 0 };
   }
 
   return null;
@@ -670,8 +692,12 @@ function normalizeRecords(records) {
       .slice()
       .reverse()
       .find((k) => {
-        const v = String(records[0][k] || "").replace(/[.,\s]/g, "");
-        return /^\d+$/.test(v);
+        // Erste bis zu 10 Zeilen prüfen — Zeile 0 allein kann leer sein.
+        for (let i = 0; i < Math.min(records.length, 10); i++) {
+          const v = String(records[i][k] ?? "").replace(/[.,\s]/g, "");
+          if (/^\d+$/.test(v)) return true;
+        }
+        return false;
       });
 
   return records.map((r) => ({
@@ -693,7 +719,33 @@ function parseBetrag(val) {
   if (/^\d{1,3}(\.\d{3})*,\d+$/.test(s)) {
     return parseFloat(s.replace(/\./g, "").replace(",", "."));
   }
+  // Englisches Tausenderformat (1,234.56) — sonst wären es 1.234 statt 1234.56.
+  if (/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)) {
+    return parseFloat(s.replace(/,/g, "")) || 0;
+  }
   return parseFloat(s.replace(",", ".")) || 0;
+}
+
+// Typ-Klassifikation an genau einer Stelle (vorher 3× identische Listen).
+const OH_TYP_AUSGABE = ["A", "AUFWAND", "AUFWENDUNG", "AUSGABE", "AUSGABEN"];
+const OH_TYP_ERTRAG = ["E", "ERTRAG", "ERTRAGE", "EINNAHME", "EINNAHMEN"];
+function ohIstAusgabe(typ) {
+  return OH_TYP_AUSGABE.includes(typ);
+}
+function ohIstErtrag(typ) {
+  return OH_TYP_ERTRAG.includes(typ);
+}
+
+// Suche entprellen: jeder Tastenschlag baut sonst beide Charts neu auf.
+function ohEntprellt(fn, millis) {
+  let timer = null;
+  return function (...args) {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      timer = null;
+      fn.apply(this, args);
+    }, millis);
+  };
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -765,7 +817,10 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
       </div>
       <div class="col-auto ms-auto">
         <input type="text" id="oh-search-${uid}" class="form-control form-control-sm"
-               placeholder="🔍 Produktbereich suchen…" style="width:220px;">
+               placeholder="🔍 Produktbereich suchen…" style="width:220px;" aria-label="Produktbereich suchen">
+      </div>
+      <div class="col-auto">
+        <button id="oh-btn-export-${uid}" type="button" class="btn btn-sm btn-outline-secondary">CSV-Export</button>
       </div>
     </div>
 
@@ -784,6 +839,18 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
         <canvas id="oh-chart-bereich-${uid}" style="max-height:380px;"></canvas>
       </div>
     </div>
+
+    ${jahre.length >= 2 ? `
+    <!-- Saldo-Verlauf über Jahre (nur bei mehreren Jahren sinnvoll) -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Einnahmen &amp; Ausgaben im Zeitverlauf</span>
+        <small class="text-muted">alle Jahre · aktuelle Ansicht/Suche</small>
+      </div>
+      <div class="card-body">
+        <canvas id="oh-chart-verlauf-${uid}" style="max-height:300px;"></canvas>
+      </div>
+    </div>` : ""}
 
     <!-- Drill-Down: Produktgruppen einer Auswahl -->
     <div class="card mb-4" id="oh-drilldown-card-${uid}" style="display:none;">
@@ -809,11 +876,11 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
           <table class="table table-sm table-striped table-hover mb-0">
             <thead class="table-dark sticky-top">
               <tr>
-                <th>Produktbereich</th>
-                <th>Produktgruppe</th>
-                <th class="text-end">Erträge (€)</th>
-                <th class="text-end">Aufwand (€)</th>
-                <th class="text-end">Saldo (€)</th>
+                <th scope="col">Produktbereich</th>
+                <th scope="col">Produktgruppe</th>
+                <th scope="col" class="text-end">Erträge (€)</th>
+                <th scope="col" class="text-end">Aufwand (€)</th>
+                <th scope="col" class="text-end">Saldo (€)</th>
               </tr>
             </thead>
             <tbody id="oh-table-body-${uid}"></tbody>
@@ -830,23 +897,12 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
 
   // ── Hilfsfunktionen ───────────────────────────
 
-  /** Filtert Records nach Jahr, Ansicht und Suchtext */
-  function getFiltered() {
+  /** Filtert Records nach Jahr, Ansicht und Suchtext (ohneJahr: Verlauf). */
+  function getFiltered(ohneJahr = false) {
     return allRecords.filter((r) => {
-      if (currentJahr && r.jahr !== currentJahr) return false;
-      if (currentAnsicht !== "beide") {
-        const t = r.typ;
-        if (
-          currentAnsicht === "E" &&
-          !["E", "ERTRAG", "ERTRAGE", "EINNAHME", "EINNAHMEN"].includes(t)
-        )
-          return false;
-        if (
-          currentAnsicht === "A" &&
-          !["A", "AUFWAND", "AUFWENDUNG", "AUSGABE", "AUSGABEN"].includes(t)
-        )
-          return false;
-      }
+      if (!ohneJahr && currentJahr && r.jahr !== currentJahr) return false;
+      if (currentAnsicht === "E" && !ohIstErtrag(r.typ)) return false;
+      if (currentAnsicht === "A" && !ohIstAusgabe(r.typ)) return false;
       if (currentSearch) {
         const s = currentSearch.toLowerCase();
         if (
@@ -870,20 +926,8 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
       if (!map.has(key))
         map.set(key, { label: name, einnahmen: 0, ausgaben: 0 });
       const entry = map.get(key);
-      const isAusgabe = [
-        "A",
-        "AUFWAND",
-        "AUFWENDUNG",
-        "AUSGABE",
-        "AUSGABEN",
-      ].includes(r.typ);
-      const isErtrag = [
-        "E",
-        "ERTRAG",
-        "ERTRAGE",
-        "EINNAHME",
-        "EINNAHMEN",
-      ].includes(r.typ);
+      const isAusgabe = ohIstAusgabe(r.typ);
+      const isErtrag = ohIstErtrag(r.typ);
       if (isAusgabe) entry.ausgaben += r.betrag;
       else if (isErtrag) entry.einnahmen += r.betrag;
       else entry.ausgaben += r.betrag; // Fallback
@@ -903,20 +947,8 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
       if (!map.has(key))
         map.set(key, { bereich: bereich, label: name, einnahmen: 0, ausgaben: 0 });
       const entry = map.get(key);
-      const isAusgabe = [
-        "A",
-        "AUFWAND",
-        "AUFWENDUNG",
-        "AUSGABE",
-        "AUSGABEN",
-      ].includes(r.typ);
-      const isErtrag = [
-        "E",
-        "ERTRAG",
-        "ERTRAGE",
-        "EINNAHME",
-        "EINNAHMEN",
-      ].includes(r.typ);
+      const isAusgabe = ohIstAusgabe(r.typ);
+      const isErtrag = ohIstErtrag(r.typ);
       if (isAusgabe) entry.ausgaben += r.betrag;
       else if (isErtrag) entry.einnahmen += r.betrag;
       else entry.ausgaben += r.betrag;
@@ -929,14 +961,10 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
   // ── KPI-Kacheln rendern ───────────────────────
   function renderKpis(records) {
     const totalAusgaben = records
-      .filter((r) =>
-        ["A", "AUFWAND", "AUFWENDUNG", "AUSGABE", "AUSGABEN"].includes(r.typ),
-      )
+      .filter((r) => ohIstAusgabe(r.typ))
       .reduce((s, r) => s + r.betrag, 0);
     const totalEinnahmen = records
-      .filter((r) =>
-        ["E", "ERTRAG", "ERTRAGE", "EINNAHME", "EINNAHMEN"].includes(r.typ),
-      )
+      .filter((r) => ohIstErtrag(r.typ))
       .reduce((s, r) => s + r.betrag, 0);
     const saldo = totalEinnahmen - totalAusgaben;
     const anzahlBereiche = new Set(records.map((r) => r.bereichNr)).size;
@@ -1065,7 +1093,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
     if (titleEl) titleEl.textContent = `Produktgruppen: ${bereichData.label}`;
 
     // Zur Karte scrollen
-    card.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (card && card.scrollIntoView) card.scrollIntoView({ behavior: "smooth", block: "start" });
 
     const ctx = container.querySelector("#oh-chart-gruppe-" + uid);
     if (!ctx) return;
@@ -1116,6 +1144,73 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
     });
   }
 
+  /** Aggregiert zu { jahr, einnahmen, ausgaben } für den Zeitverlauf. */
+  function aggregiereNachJahr(records) {
+    const map = new Map();
+    records.forEach((r) => {
+      if (!r.jahr) return;
+      if (!map.has(r.jahr))
+        map.set(r.jahr, { jahr: r.jahr, einnahmen: 0, ausgaben: 0 });
+      const entry = map.get(r.jahr);
+      if (ohIstAusgabe(r.typ)) entry.ausgaben += r.betrag;
+      else if (ohIstErtrag(r.typ)) entry.einnahmen += r.betrag;
+      else entry.ausgaben += r.betrag;
+    });
+    return [...map.values()].sort((a, b) =>
+      String(a.jahr).localeCompare(String(b.jahr), "de"),
+    );
+  }
+
+  // ── Verlaufsdiagramm rendern (Jahresvergleich, jahrunabhängig) ──
+  function renderVerlaufChart() {
+    const ctx = container.querySelector("#oh-chart-verlauf-" + uid);
+    if (!ctx) return;
+    const daten = aggregiereNachJahr(getFiltered(true));
+    if (runtime.verlaufChart) runtime.verlaufChart.destroy();
+    if (daten.length < 2) {
+      runtime.verlaufChart = null;
+      return;
+    }
+    runtime.verlaufChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: daten.map((d) => d.jahr),
+        datasets: [
+          {
+            label: "Erträge/Einnahmen (€)",
+            data: daten.map((d) => d.einnahmen),
+            borderColor: "rgba(25, 135, 84, 1)",
+            backgroundColor: "rgba(25, 135, 84, 0.15)",
+            tension: 0.15,
+          },
+          {
+            label: "Aufwand/Ausgaben (€)",
+            data: daten.map((d) => d.ausgaben),
+            borderColor: "rgba(220, 53, 69, 1)",
+            backgroundColor: "rgba(220, 53, 69, 0.15)",
+            tension: 0.15,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (ctx) =>
+                ` ${ctx.dataset.label}: ${formatEuro(ctx.parsed.y)}`,
+            },
+          },
+          legend: { position: "top" },
+        },
+        scales: {
+          y: { ticks: { callback: (val) => formatEuroKurz(val) } },
+        },
+      },
+    });
+  }
+
   // ── Detailtabelle rendern ─────────────────────
   function renderTabelle(records) {
     const daten = aggregiereNachGruppe(records);
@@ -1136,8 +1231,9 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
       .map((d) => {
         const saldo = d.einnahmen - d.ausgaben;
         const saldoClass = saldo >= 0 ? "text-success" : "text-danger";
+        const drilldownZiel = d.bereich || "";
         return `
-        <tr>
+        <tr${drilldownZiel ? ` data-oh-bereich="${escapeHtml(drilldownZiel)}" class="oh-clickable-row" title="Produktgruppen anzeigen"` : ""}>
           <td class="text-muted small">${escapeHtml(d.bereich || "")}</td>
           <td>${escapeHtml(d.label)}</td>
           <td class="text-end text-success">${formatEuro(d.einnahmen)}</td>
@@ -1152,9 +1248,12 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
 
   // ── Alles zusammen aktualisieren ──────────────
   function updateAll() {
+    // Entprellte Suche kann nach einem Seitenwechsel feuern.
+    if (runtime.disposed) return;
     const records = getFiltered();
     renderKpis(records);
     renderBereichChart(records);
+    renderVerlaufChart();
     renderTabelle(records);
 
     // Drill-Down schließen bei Filterwechsel
@@ -1179,9 +1278,46 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
     });
   });
 
-  container.querySelector("#oh-search-" + uid)?.addEventListener("input", (e) => {
+  container.querySelector("#oh-search-" + uid)?.addEventListener("input", ohEntprellt((e) => {
+    if (runtime.disposed) return;
     currentSearch = e.target.value.trim();
     updateAll();
+  }, 250));
+
+  // Tabellenzeilen-Klick öffnet den Drilldown des zugehörigen Bereichs
+  // (Event-Delegation: tbody überlebt Tabellen-Neuzeichnungen).
+  container.querySelector("#oh-table-body-" + uid)?.addEventListener("click", (e) => {
+    const tr = e.target && e.target.closest ? e.target.closest("tr[data-oh-bereich]") : null;
+    if (!tr || runtime.disposed) return;
+    const label = tr.getAttribute("data-oh-bereich") || "";
+    if (!label) return;
+    zeigeGruppeDrilldown({ label }, getFiltered());
+  });
+
+  container.querySelector("#oh-btn-export-" + uid)?.addEventListener("click", () => {
+    if (runtime.disposed) return;
+    const daten = aggregiereNachGruppe(getFiltered());
+    const esc = (v) => {
+      const s = String(v ?? "");
+      return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    };
+    const zeilen = ["Produktbereich;Produktgruppe;Erträge (EUR);Aufwand (EUR);Saldo (EUR)"];
+    daten.forEach((d) => {
+      zeilen.push(
+        [d.bereich, d.label, d.einnahmen.toFixed(2), d.ausgaben.toFixed(2), (d.einnahmen - d.ausgaben).toFixed(2)]
+          .map(esc)
+          .join(";"),
+      );
+    });
+    const blob = new Blob(["\uFEFF" + zeilen.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "haushalt-export.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
 
   container
@@ -1238,11 +1374,12 @@ function escapeHtml(str) {
     .replace(/'/g, "&#39;");
 }
 
+// F-35-Helfer-Vertrag: safeHttpUrl muss als Top-Level-Funktion vorhanden sein
+// (check-xss-url), auch wenn diese App aktuell keine URL-Sinks rendert.
 function safeHttpUrl(value) {
   const s = String(value || "").trim();
   return /^https?:\/\//i.test(s) ? s : "";
 }
-
 
   /* ── Schale 4: KPI Kontext ── */
   function kpiContext(kontext, id, uid) {
@@ -1341,27 +1478,10 @@ function formatBytes(bytes) {
 // ══════════════════════════════════════════════════════════════
 
 /*
- * Diese Funktion lädt Chart.js aus einem CDN in den <head> der Seite.
- * Wird automatisch vor app() aufgerufen.
+ * Diese Funktion lädt Chart.js (vendored) in den <head> der Seite.
+ * Wird automatisch vor app() aufgerufen. Styles leben in app/app.css.
  */
 function addToHead() {
-  // CSS-Styles einfügen
-  const style = document.createElement("style");
-  style.textContent = `
-    #oh-chart-bereich,
-    #oh-chart-gruppe { cursor: pointer; }
-
-    #oh-kpis .card { transition: box-shadow 0.2s; }
-    #oh-kpis .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-
-    .oh-hint {
-      font-size: 0.8rem;
-      color: #6c757d;
-      margin-top: 4px;
-    }
-  `;
-  document.head.appendChild(style);
-
   // Chart.js per Script-Element laden und Promise zurückgeben
   return new Promise((resolve, reject) => {
     if (window.Chart) {

@@ -13,10 +13,13 @@ Interaktive Visualisierung des kommunalen Ergebnishaushalts für den [Open Data 
 Single Page Application mit Logo, Menü, Impressum/Datenschutz/Kontakt-Seiten und Fußzeile. Die Konfiguration wird vom ODAS geladen. Inhalte:
 
 - **Balkendiagramm** – Einnahmen und Ausgaben nach Produktbereichen
-- **Drill-Down** – Klick auf einen Produktbereich zeigt die enthaltenen Produktgruppen
+- **Verlaufsdiagramm** – Einnahmen und Ausgaben im Zeitverlauf (ab 2 Jahren)
+- **Drill-Down** – Klick auf einen Produktbereich oder eine Tabellenzeile zeigt die enthaltenen Produktgruppen
 - **KPI-Kacheln** – Gesamterträge, Gesamtaufwand, Saldo, Anzahl Produktbereiche
 - **Detailtabelle** – Alle Produktgruppen mit Einnahmen, Ausgaben und Saldo
 - **Filter** – nach Haushaltsjahr, Ansicht (Einnahmen / Ausgaben / beide) und Freitextsuche
+- **CSV-Export** – gefilterte Ansicht als Excel-kompatible CSV
+- Datenquellen: ODS-Suche (API v2.1), CKAN-Tabellen und statische CSV/JSON-Dateien
 
 ---
 
