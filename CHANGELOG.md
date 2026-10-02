@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.24.4 - 2026-10-02
+- ENH: Verwendete ODAS-Dienste in `odas-services` deklariert.
+
 ## 1.24.3 - 2026-09-10
 - **FIX:** Same-Page-Re-Render räumt alte Charts ab (OH-B1, previous-cleanup vor `ohCleanups.set`).
 - **FIX:** Typ-Gate lässt CKAN-Tabellen und statische CSV/JSON-Dateien zu (OH-B2, `erwarteteTypen`); vorhandene Parser dahinter waren sonst unerreichbar.
