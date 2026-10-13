@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.24.6 - 2026-10-13
+- FIX: Standard-Fehleranzeige gibt präzisere Tipps: ein „Failed to fetch“ ohne Proxy-Kontext erhält einen Netzwerk-Hinweis statt `proxyAktiv`; der 404-Hinweis gilt nur noch für echte HTTP-404-Antworten und nennt den lokal fehlenden Proxy/Relay statt pauschal „Datensatz auf dem Portal nicht gefunden“.
+
 ## 1.24.5 - 2026-10-08
 - FIX: F-147: Vorzeichen in deutschen und englischen Betragsformaten erhalten; ungültige Zahlen nicht mehr als Präfixbetrag übernehmen.
 - FIX: F-147 (Nachbesserung): Strich-Platzhalter („-“, „–“) wieder als 0, eindeutige Tausender wie „1.234.567“ und Währungsangaben („€“, „EUR“) lesbar; unlesbare Beträge nennen den Wert in der Fehlermeldung.
