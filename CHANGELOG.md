@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.24.5 - 2026-10-08
+- FIX: F-147: Vorzeichen in deutschen und englischen Betragsformaten erhalten; ungültige Zahlen nicht mehr als Präfixbetrag übernehmen.
+- FIX: F-147 (Nachbesserung): Strich-Platzhalter („-“, „–“) wieder als 0, eindeutige Tausender wie „1.234.567“ und Währungsangaben („€“, „EUR“) lesbar; unlesbare Beträge nennen den Wert in der Fehlermeldung.
+- FIX: F-142: Unvollständige ODS-/CKAN-Datenfenster ausdrücklich als Teilbestand für Summen, Diagramme und Export kennzeichnen.
+
 ## 1.24.4 - 2026-10-02
 - ENH: Verwendete ODAS-Dienste in `odas-services` deklariert.
 

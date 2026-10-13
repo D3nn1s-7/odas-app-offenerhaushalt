@@ -496,8 +496,8 @@ function app(configdata = {}, enclosingHtmlDivElement) {
       const verworfen = ladeErgebnis ? ladeErgebnis.verworfen : 0;
       if (!records || records.length === 0) {
         enclosingHtmlDivElement.innerHTML = `
-          <div class="alert alert-info mt-4" role="alert">
-            Keine Datensätze in der Datenquelle gefunden.
+          <div class="alert ${records && records.ladeHinweis ? "alert-warning" : "alert-info"} mt-4" role="alert">
+            ${escapeHtml(records && records.ladeHinweis || "Keine Datensätze in der Datenquelle gefunden.")}
           </div>`;
         return;
       }
@@ -603,7 +603,14 @@ function parseJson(json) {
     );
   }
 
-  return normalizeRecords(records);
+  const normalized = normalizeRecords(records);
+  // F-142: API-Fenster nicht als vollständigen Haushalt ausgeben.
+  const total = Number(json && (json.total_count ?? json.nhits ?? json.result?.total));
+  if (Number.isFinite(total) && total > records.length) {
+    normalized.ladeHinweis = "Teilbestand: " + records.length + " von " + total +
+      " Positionen geladen. Summen, Diagramme und Export beziehen sich nur auf dieses Datenfenster.";
+  }
+  return normalized;
 }
 
 // F-72: CSV wird ueber die vendorte PapaParse geparst statt ueber einen
@@ -714,16 +721,22 @@ function normalizeRecords(records) {
 }
 
 function parseBetrag(val) {
-  if (typeof val === "number") return val;
-  const s = String(val).replace(/\s/g, "");
-  if (/^\d{1,3}(\.\d{3})*,\d+$/.test(s)) {
-    return parseFloat(s.replace(/\./g, "").replace(",", "."));
+  // F-147: Vorzeichen erhalten und den ganzen Betrag prüfen, nicht nur einen Präfix.
+  if (typeof val === "number" && Number.isFinite(val)) return val;
+  const s = String(val ?? "").replace(/\s/g, "").replace(/^−/, "-").replace(/^€|(?:€|EUR)$/i, "");
+  // Leere Zelle und Strich-Platzhalter ("-", "–") bedeuten in Haushaltstabellen 0.
+  if (!s || /^[-–—]$/.test(s)) return 0;
+  let normalized = s;
+  if (/^[+-]?(?:\d+|\d{1,3}(?:\.\d{3})+),\d+$/.test(s) || /^[+-]?\d{1,3}(?:\.\d{3}){2,}$/.test(s)) {
+    normalized = s.replace(/\./g, "").replace(",", ".");
+  } else if (/^[+-]?\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)) {
+    normalized = s.replace(/,/g, "");
+  } else if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(s)) {
+    throw new Error(`Ungültiger Betrag in der Datenquelle: „${String(val)}“.`);
   }
-  // Englisches Tausenderformat (1,234.56) — sonst wären es 1.234 statt 1234.56.
-  if (/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)) {
-    return parseFloat(s.replace(/,/g, "")) || 0;
-  }
-  return parseFloat(s.replace(",", ".")) || 0;
+  const betrag = Number(normalized);
+  if (!Number.isFinite(betrag)) throw new Error(`Ungültiger Betrag in der Datenquelle: „${String(val)}“.`);
+  return betrag;
 }
 
 // Typ-Klassifikation an genau einer Stelle (vorher 3× identische Listen).
@@ -826,6 +839,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
 
     ${freshnessHtml}
     ${verworfenHtml}
+    ${allRecords.ladeHinweis ? '<div class="alert alert-warning" role="alert">' + escapeHtml(allRecords.ladeHinweis) + '</div>' : ''}
     <!-- KPI-Kacheln -->
     <div class="row g-3 mb-4" id="oh-kpis-${uid}"></div>
 
