@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.24.9 - 2026-10-15
+- FIX: Kopfzeile bei 360 px ohne Überlauf (Template): Logo- und Burger-Spalte passen sich der Breite an, das Menü-Symbol ragt nicht mehr über den rechten Rand. Keine Änderung an App-Code oder Konfiguration.
+
 ## 1.24.8 - 2026-10-15
 - FIX: Mobile Ansicht: Das Drilldown-Diagramm hat jetzt eine feste Höhe und eine nutzbare Plotfläche. In der Detailtabelle sind die Beträge auf Handys in Kurzform („12,3 Mio. €“) lesbar, die Spalte „Produktbereich“ ist unter 768 px ausgeblendet, sodass die Saldo-Spalte ohne seitliches Wischen sichtbar bleibt. Auf größeren Bildschirmen bleiben die vollen Beträge unverändert.
 
