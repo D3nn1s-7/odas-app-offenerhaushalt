@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.24.8 - 2026-10-15
+- FIX: Mobile Ansicht: Das Drilldown-Diagramm hat jetzt eine feste Höhe und eine nutzbare Plotfläche. In der Detailtabelle sind die Beträge auf Handys in Kurzform („12,3 Mio. €“) lesbar, die Spalte „Produktbereich“ ist unter 768 px ausgeblendet, sodass die Saldo-Spalte ohne seitliches Wischen sichtbar bleibt. Auf größeren Bildschirmen bleiben die vollen Beträge unverändert.
+
 ## 1.24.7 - 2026-10-15
 - DOCS: Neue Store-Screenshots: je drei Desktop- (1440 × 1000) und Mobile-Aufnahmen (390 × 844) der aktuellen App, aufgenommen auf der Dev-Instanz. Bisherige Bilder nach `docs/screenshots/archive/2026-10-13/` verschoben. Keine Änderung an App-Code oder Konfiguration.
 

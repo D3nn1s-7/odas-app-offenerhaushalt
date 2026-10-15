@@ -28,3 +28,14 @@
 
 /* Tabellenzeilen mit Drilldown-Ziel */
 .oh-clickable-row { cursor: pointer; }
+
+/* Drilldown-Diagramm: feste Höhe, damit es auf Handys nicht auf 2:1 zusammenschrumpft */
+.oh-chart-gruppe-box { position: relative; height: 320px; }
+
+/* Detailtabelle: lange Produktgruppen-Namen dürfen umbrechen, damit die Betragsspalten Platz behalten */
+.oh-detailtabelle td:nth-child(2) { overflow-wrap: anywhere; hyphens: auto; }
+@media (max-width: 575.98px) {
+  .oh-chart-gruppe-box { height: 440px; }
+  .oh-detailtabelle { font-size: 0.8125rem; }
+  .oh-detailtabelle th, .oh-detailtabelle td { padding-left: 0.25rem; padding-right: 0.25rem; }
+}

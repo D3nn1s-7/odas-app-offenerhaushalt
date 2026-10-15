@@ -41,3 +41,10 @@ for (const [input, expected] of [
 test("F-147 unlesbarer Betrag nennt den Wert in der Fehlermeldung", () => {
   assert.throws(() => app.parseBetrag("k.A."), /„k\.A\.“/);
 });
+test("Kurzform für Handy-Tabellen: Mrd./Mio./T€, Vorzeichen bleibt, kleine Beträge voll", () => {
+  const z = (v) => app.euroZelle(v).split("</span>")[1].replace(/<[^>]+>/g, "");
+  assert.equal(z(7_500_000_000), "7,5 Mrd. €");
+  assert.equal(z(-43_700_000), "-43,7 Mio. €");
+  assert.equal(z(592_000), "592 T€");
+  assert.equal(z(999.5), app.formatEuro(999.5));
+});

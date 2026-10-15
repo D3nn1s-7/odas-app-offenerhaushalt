@@ -885,7 +885,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
         </button>
       </div>
       <div class="card-body">
-        <canvas id="oh-chart-gruppe-${uid}" style="max-height:320px;"></canvas>
+        <div class="oh-chart-gruppe-box"><canvas id="oh-chart-gruppe-${uid}"></canvas></div>
       </div>
     </div>
 
@@ -897,11 +897,11 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
       </div>
       <div class="card-body p-0">
         <div class="table-responsive" style="max-height:400px; overflow-y:auto;">
-          <table class="table table-sm table-striped table-hover mb-0">
+          <table class="table table-sm table-striped table-hover mb-0 oh-detailtabelle">
             <thead class="table-dark sticky-top">
               <tr>
-                <th scope="col">Produktbereich</th>
-                <th scope="col">Produktgruppe</th>
+                <th scope="col" class="d-none d-md-table-cell">Produktbereich</th>
+                <th scope="col"><span class="d-none d-sm-inline">Produktgruppe</span><span class="d-sm-none">Gruppe</span></th>
                 <th scope="col" class="text-end">Erträge (€)</th>
                 <th scope="col" class="text-end">Aufwand (€)</th>
                 <th scope="col" class="text-end">Saldo (€)</th>
@@ -1148,7 +1148,7 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
       data: { labels, datasets },
       options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         plugins: {
           tooltip: {
             callbacks: {
@@ -1258,12 +1258,12 @@ function renderApp(allRecords, container, appTitel, filterJahr, configdata, uid,
         const drilldownZiel = d.bereich || "";
         return `
         <tr${drilldownZiel ? ` data-oh-bereich="${escapeHtml(drilldownZiel)}" class="oh-clickable-row" title="Produktgruppen anzeigen"` : ""}>
-          <td class="text-muted small">${escapeHtml(d.bereich || "")}</td>
+          <td class="text-muted small d-none d-md-table-cell">${escapeHtml(d.bereich || "")}</td>
           <td>${escapeHtml(d.label)}</td>
-          <td class="text-end text-success">${formatEuro(d.einnahmen)}</td>
-          <td class="text-end text-danger">${formatEuro(d.ausgaben)}</td>
-          <td class="text-end fw-semibold ${saldoClass}">
-            ${saldo >= 0 ? "+" : ""}${formatEuro(saldo)}
+          <td class="text-end text-nowrap text-success">${euroZelle(d.einnahmen)}</td>
+          <td class="text-end text-nowrap text-danger">${euroZelle(d.ausgaben)}</td>
+          <td class="text-end text-nowrap fw-semibold ${saldoClass}">
+            ${saldo >= 0 ? "+" : ""}${euroZelle(saldo)}
           </td>
         </tr>`;
       })
@@ -1376,10 +1376,17 @@ function formatEuro(val) {
 
 /** Formatiert einen Eurobetrag kurz für Achsenbeschriftungen (z.B. 1,2 Mio.) */
 function formatEuroKurz(val) {
+  if (Math.abs(val) >= 1_000_000_000)
+    return (val / 1_000_000_000).toFixed(1).replace(".", ",") + " Mrd. €";
   if (Math.abs(val) >= 1_000_000)
     return (val / 1_000_000).toFixed(1).replace(".", ",") + " Mio. €";
   if (Math.abs(val) >= 1_000) return (val / 1_000).toFixed(0) + " T€";
   return val + " €";
+}
+
+/** Tabellenzelle: voller Betrag ab sm, Kurzform (Mio./T€) auf Handys */
+function euroZelle(val) {
+  return `<span class="d-none d-sm-inline">${formatEuro(val)}</span><span class="d-sm-none">${Math.abs(val) < 1000 ? formatEuro(val) : formatEuroKurz(val)}</span>`;
 }
 
 /** Kürzt einen String auf maxLen Zeichen */
